@@ -29,7 +29,7 @@ Transit defines the rules for encoding and decoding semantically typed values. I
 ### Tag-based encoding
 
 When necessary, values are encoded as a tag indicating their semantic type and the value represented in a form that can be represented directly in msgpack or json or which can itself be encoded. Each of the semantic types that transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in msgpack or json, it is encoded one of two ways:
-* as a string  ```"~" + tag-char + value-str ```
+* as a string  ```"~" + tag-char + value-str```
 * as an object ```{"~#tag" : value}```
 
 The table below lists all of the built-in semantic types and their corresponding tags. The rows highlighted in green represent ground types. In general, instances of ground types are represented directly in msgpack or json, although there are some exceptions. The rows in white are extended types. Instances of extended types are never represented directly in msgpack or json, they are always encoded. Whether they are encoded in string or map form depends on whether the data is a scalar or a composite as well as whether it is being written to msgpack or json. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form.
@@ -110,7 +110,7 @@ To convert a cache code to an integer index:
  
 On the writing side, the cache is implemented as two data structures: an incrementing counter and a map of original values to cache code.
 
-```next id = 	42```
+```next id = 42```
 
 |String representation|Replacement|
 |-------|-----------|
@@ -125,7 +125,7 @@ The first time a cacheable value is written, transit adds an entry to to the cac
 
 On the reading side, the cache is also implemented as two data structures: an incrementing counter and an array.
 
-```next id = 	42```
+```next id = 42```
 
 |Index|Replacement value
 |:----|:----------------
@@ -160,7 +160,7 @@ A handler maps values of a programming language type to values of a transit sema
 |tag|object|return tag for object
 |rep|object|return encodable representation of object
 |stringRep|object|return string representation of object
-|verboseHandler|<none>|return an alternate handler to use in verbose mode to produce a more readable representation
+|verboseHandler|&lt;none>|return an alternate handler to use in verbose mode to produce a more readable representation
 
 A handler for an extension type must implement the rep operation. Transit calls rep to get an encodable representation of a value. The encodable representation may be any type for which a handler exists OR a type that can be mapped directly to a ground semantic type. The tag rep column in the semantic type table above lists the programming language types that map directly to ground types without requiring handlers (for instance, an iterable maps directly to an array). Transit implementations provide an as-tag function to allow you to specify a particular tag and rep to use to represent an extension type, if that is more efficient than representing an extension type using a type for which a handler exists. For example, you can represent an extension type as an array by either having rep return an array (for which there is a handler) or by having it return an as-tag value with the tag "array" and an iterable value as the rep. 
 
@@ -216,13 +216,17 @@ Here is an example of a handler and a decoder for the circle semantic type that 
 
 The transit encoding of a circle at 10, 20 with a radius of 5 looks like this in json:
 
-    {"~#circle" : [{"~#point" : [10 20]}, 5]}
+```javascript
+{"~#circle" : [{"~#point" : [10 20]}, 5]}
+```
 
 ### Quoting
 
 Some json processors only allow arrays or objects as top level forms. If you write a single scalar value using transit, it gets quoted. A quoted scalar is represented as a map on the wire:
 
-    {"~#'" : "a string"}
+```javascript
+{"~#'" : "a string"}
+```
 
 Transit handles quoting scalars on write and unquoting them on read as necessary.
 
