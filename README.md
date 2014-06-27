@@ -10,13 +10,13 @@ allows context-free parsing of typed values
 can by implemented on top of existing high-speed parsers.
 
 There are implementations for the following languages:
-Clojure - transit-clj
-Java - transit-java
-Ruby - transit-ruby
-Python - transit-python
-JS - transit-js
-ClojureScript - transit-cljs
-C# - transit-csharp
+* Clojure - transit-clj
+* Java - transit-java
+* Ruby - transit-ruby
+* Python - transit-python
+* JS - transit-js
+* ClojureScript - transit-cljs
+* C# - transit-csharp
 
 ## How it works
 
@@ -29,44 +29,38 @@ Transit defines the rules for encoding and decoding semantically typed values. I
 ### Tag-based encoding
 
 When necessary, values are encoded as a tag indicating their semantic type and the value represented in a form that can be represented directly in msgpack or json or which can itself be encoded. Each of the semantic types that transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in msgpack or json, it is encoded one of two ways:
-* as a string
- 
-    "~" + tag-char + value-str
-
-* as an object
-
-    {"~#tag" : value}
+* as a string  ```"~" + tag-char + value-str ```
+* as an object ```{"~#tag" : value}```
 
 The table below lists all of the built-in semantic types and their corresponding tags. The rows highlighted in green represent ground types. In general, instances of ground types are represented directly in msgpack or json, although there are some exceptions. The rows in white are extended types. Instances of extended types are never represented directly in msgpack or json, they are always encoded. Whether they are encoded in string or map form depends on whether the data is a scalar or a composite as well as whether it is being written to msgpack or json. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form.
- 
 
-| |Semantic Type|Tag|Rep Tag|Rep|String rep (if not already)|msgpack|json|json-verbose (no caching)
-|-|:------------|:--|:------|:--|:--------------------------|:------|:---|:------------------------|
-|scalar| null| _ | | nil |"_" |nil| null when not key, else "~_" | null when not key, else "~_" 
-|scalar| string| s | | "string" | | String | String | String 
-|scalar| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"
-|scalar|integer| i| | integer| "123"| smallest int that holds value or "~i1234..." | if > long < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."
-|scalar|decimal| d| |  floating pt number | "123.456" | float32 | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"
-|scalar| bytes | b | | byte array | "base64"|  "~bbase64" | "~bbase64" | "~bbase64"
-|scalar| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key"
-|scalar| symbol | $ |s| "sym"| | "~$sym"| "~$sym"| "~$sym"
-|scalar| big decimal| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456"
-|scalar| big integer|	n|	s|	"123"| |	"~n1234"|	"~n1234"|	"~n1234" 
-|scalar| time |m| i| int msecs| "1234566789" | {"~#m" : int}|  "~m123456789" | N/A 
-|scalar| time |t |s| "1985-04-12T23:20:50.52Z"| | NA| NA| "~t1985-04-12T23:20:50.52Z"
-|scalar| uuid | u | s or array|  [int int]|  "531a379e-31bb-4ce1-8690-158dceb64be6"|  {"~#u" : [hi64 lo64]}|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"
-|scalar| uri| r| s| "http://..."| "~rhttp://..."| "~rhttp://..."| "~rhttp://..."
-|scalar| char |c| s| "c"| | "~cc" | "~cc"| "~cc"
-|scalar|Scalar extension type | X|  specify or s | "arep" or arep|  "arep" | "~Xarep" or {"~#X" : arep}|  "~Xarep" or {"~#X" : arep} | "~Xarep" or {"~#X" : arep}
-|scalar| quoted scalar| ' | | scalar value| NA|	{"~#'" : scalar } | {"~#'" : scalar } | {"~#'" : scalar }
-|composite| array | array | | iterable | |  Array |  Array |  Array
-|composite| map |  map |  |  iterable<map entry> |  |  Object  | Array: ["^ " k1 v1 k2 v2 ...] |  Object
-|composite| set |  set |  array  | [vals...] |  |  {"~#set" : [vals ...]} |  {"~#set" : [vals ...]} |  {"~#set" : [vals ...]}
-|composite| list |  list |  array |  [vals...] |  |  {"~#list" : [vals ...]} |  {"~#list" : [vals ...]} |  {"~#list" : [vals ...]}
-|composite| map w/ composite keys |  cmap |  array |  [k1 v1 k2 v2 ...] |  |  {"~#cmap" : [k1 v1 k2 v2 ...]} |  {"~#cmap" : [k1 v1 k2 v2 ...]} |  {"~#cmap" : [k1 v1 k2 v2 ...]}
-|composite| typed array (ints, floats, ...) |  ints, floats, ...  |  array |  [vals ...] |  |  {"~#ints" : [vals ...]} |  {"~#ints" : [vals ...]} |  {"~#ints" : [vals ...]}
+|   | Semantic Type | Tag | Rep Tag | String rep (if not already) | msgpack | json | json-verbose (no caching) |
+|:--|:--------------|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
+|scalar| null| _ | | nil |"\_" |nil| null when not key, else "~\_" | null when not key, else "~\_" |
+|scalar| string| s | | "string" | | String | String | String |
+|scalar| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"|
+|scalar|integer| i| | integer| "123"| smallest int that holds value or "~i1234..." | if > long < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
+|scalar|decimal| d| |  floating pt number | "123.456" | float32 | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
+|scalar| bytes | b | | byte array | "base64"|  "~bbase64" | "~bbase64" | "~bbase64" |
+|scalar| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key" |
+|scalar| symbol | $ |s| "sym"| | "~$sym"| "~$sym"| "~$sym" |
+|scalar| big decimal| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
+|scalar| big integer|	n|	s|	"123"| |	"~n1234"|	"~n1234"|	"~n1234" |
+|scalar| time |m| i| int msecs| "1234566789" | {"~#m" : int}|  "~m123456789" | N/A  |
+|scalar| time |t |s| "1985-04-12T23:20:50.52Z"| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
+|scalar| uuid | u | s or array|  [int int]|  "531a379e-31bb-4ce1-8690-158dceb64be6"|  {"~#u" : [hi64 lo64]}|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
+|scalar| uri| r| s| "http://..."| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
+|scalar| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
+|scalar|Scalar extension type | X|  specify or s | "arep" or arep|  "arep" | "~Xarep" or {"~#X" : arep}|  "~Xarep" or {"~#X" : arep} | "~Xarep" or {"~#X" : arep} |
+|scalar| quoted scalar| ' | | scalar value| NA|	{"~#'" : scalar } | {"~#'" : scalar } | {"~#'" : scalar } |
+|composite| array | array | | iterable | |  Array |  Array |  Array |
+|composite| map |  map |  |  iterable<map entry> |  |  Object  | Array: ["^ " k1 v1 k2 v2 ...] |  Object |
+|composite| set |  set |  array  | [vals...] |  |  {"~#set" : [vals ...]} |  {"~#set" : [vals ...]} |  {"~#set" : [vals ...]} |
+|composite| list |  list |  array |  [vals...] |  |  {"~#list" : [vals ...]} |  {"~#list" : [vals ...]} |  {"~#list" : [vals ...]} |
+|composite| map w/ composite keys |  cmap |  array |  [k1 v1 k2 v2 ...] |  |  {"~#cmap" : [k1 v1 k2 v2 ...]} |  {"~#cmap" : [k1 v1 k2 v2 ...]} |  {"~#cmap" : [k1 v1 k2 v2 ...]} |
+|composite| typed array (ints, floats, ...) |  ints, floats, ...  |  array |  [vals ...] |  |  {"~#ints" : [vals ...]} |  {"~#ints" : [vals ...]} |  {"~#ints" : [vals ...]} |
 |composite| link | 	link | 	map | 	map with string keys: href, rel, prompt, name and render; prompt, name and render are optional; render must be "image" or "link", as per http://amundsen.com/media-types/collection/format/#arrays-links | | | |  |
-|composite|Composite extension type |  tag |  specify |  rep |  |  {"~#tag" : rep} |  {"~#tag" : rep} |  {"~#tag" : rep}
+|composite|Composite extension type |  tag |  specify |  rep |  |  {"~#tag" : rep} |  {"~#tag" : rep} |  {"~#tag" : rep}|
 
 Note that there are two modes for writing data in json. In normal json mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also json-verbose mode, which is less efficient, but easier for a person to read. In json-verbose mode, caching is disabled and maps are represented as objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
 
