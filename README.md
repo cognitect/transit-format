@@ -238,9 +238,13 @@ It is possible that transit encoded data will contain a semantic type that a pro
 
 The diagram below describes the transit encoding process.
 
+![Transit Write Flow](img/TransitWriteFlow.png)
+
 ### Read Flow
 
 The diagram below describes the transit decoding process.
+
+![Transit Read Flow](img/TransitReadFlow.png)
 
 
 
