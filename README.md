@@ -2,7 +2,7 @@
 
 A data interchange format.
 
-# Version
+### Version
 
 This is version 0.8 of the transit format.
 
@@ -14,13 +14,12 @@ allows context-free parsing of typed values
 can by implemented on top of existing high-speed parsers.
 
 There are implementations for the following languages:
-* Clojure - transit-clj
-* Java - transit-java
-* Ruby - transit-ruby
-* Python - transit-python
-* JS - transit-js
-* ClojureScript - transit-cljs
-* C# - transit-csharp
+* [Clojure](http://github.com/cognitect/transit-clj)
+* [ClojureScript](http://github.com/cognitect/transit-cljs)
+* [Java](http://github.com/cognitect/transit-java)
+* [JS](http://github.com/cognitect/transit-js)
+* [Python](http://github.com/cognitect/tranist-python)
+* [Ruby](http://github.com/cognitect/transit-ruby)
 
 ## How it works
 
