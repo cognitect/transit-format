@@ -2,6 +2,10 @@
 
 A data interchange format.
 
+# Version
+
+This is version 0.8 of the transit format.
+
 # Specification
 
 Transit is a protocol for encoding data in JSON or MsgPack that:
@@ -39,7 +43,7 @@ The table below lists all of the built-in semantic types and their corresponding
 |scalar| null| _ | | nil |"\_" |nil| null when not key, else "~\_" | null when not key, else "~\_" |
 |scalar| string| s | | "string" | | String | String | String |
 |scalar| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"|
-|scalar|integer| i| | integer| "123"| smallest int that holds value or "~i1234..." if > long | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
+|scalar|integer (< signed 64 bit)| i| | integer| "123"| smallest int that holds value | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
 |scalar|decimal| d| |  floating pt number | "123.456" | float32 | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
 |scalar| bytes | b | | byte array | "base64"|  "~bbase64" | "~bbase64" | "~bbase64" |
 |scalar| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key" |
@@ -59,7 +63,7 @@ The table below lists all of the built-in semantic types and their corresponding
 |composite| list |  list |  array |  [vals...] |  |  {"~#list" : [vals ...]} |  {"~#list" : [vals ...]} |  {"~#list" : [vals ...]} |
 |composite| map w/ composite keys |  cmap |  array |  [k1 v1 k2 v2 ...] |  |  {"~#cmap" : [k1 v1 k2 v2 ...]} |  {"~#cmap" : [k1 v1 k2 v2 ...]} |  {"~#cmap" : [k1 v1 k2 v2 ...]} |
 |composite| typed array (ints, floats, ...) |  ints, floats, ...  |  array |  [vals ...] |  |  {"~#ints" : [vals ...]} |  {"~#ints" : [vals ...]} |  {"~#ints" : [vals ...]} |
-|composite| link | 	link | 	map | 	map with string keys: href, rel, name, render, prompt; name, render, prompt are optional; render must be "image" or "link", as per http://amundsen.com/media-types/collection/format/#arrays-links | | {"~#link" : [href rel name render promp] } | {"~#link" : [href rel name render prompt] } | {"~#link" : [href rel name render prompt]} |
+|composite| link | 	link | 	map | map with string keys: href, rel, name, render, prompt; name, render, prompt are optional; value of href is a URI, value of all other keys is a string, value of render key must be "image" or "link", as per http://amundsen.com/media-types/collection/format/#arrays-links | | {"~#link" : [href rel name render promp] } | {"~#link" : [href rel name render prompt] } | {"~#link" : [href rel name render prompt]} |
 |*composite*|*Composite extension type* | *tag* | *specify* | *rep* |  | *{"~#tag" : rep}* | *{"~#tag" : rep}* |  *{"~#tag" : rep}* |
 
 Note that there are two modes for writing data in json. In normal json mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also json-verbose mode, which is less efficient, but easier for a person to read. In json-verbose mode, caching is disabled and maps are represented as objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
@@ -72,7 +76,7 @@ Transit relies on a small number of character sequences to encode specific infor
 |:----|:----|:----
 |~|string tag|followed by single char, upper-case reserved for app extensions, then string value
 |~#|tag|followed by tag name, one or more chars
-|^|cache|followed by single char in range 33-126, treated as offset (- 33), 94 total
+|^|cache|followed by one or two chars in range 33-126 (see Caching below) 
 |"^ "|map-as-array marker|when it is first item in array, indicates array represents a map
 |`|reserved|save backquote for expansion, escaped for now
 
@@ -84,26 +88,32 @@ Transit implements a caching stream to compress repetitive data. Specifically, a
 
 #### Cache codes
 
-Cache codes are generated using an increasing integer index, from 0 to 8835. The number is converted to a one or two digit string expressed in base-94 using ASCII 33-126 for digits with a "^" prefix, i.e., "^c" or "^cc". 
+Cache codes are generated using an increasing integer index. The number is converted to a one or two digit string expressed ASCII 33-126 for numerals with a "^" prefix, i.e., "^c" or "^cc". Since there are 94 numerals and up to 2 digits, the possible range of cache codes is from 0 to 94^2. The code below shows how to convert back and forth between integer indexes and the corresponding cache codes.
 
-To convert an integer index to a cache code:
-```clojure
-(defn index-to-cache-code [i]
-  (let [lo (mod i 94)
-        hi (quot i 94)]
-    (if (zero? hi)
-      (str "^" (char (+ lo 33)))
-      (str "^" (char (+ hi 33)) (char (+ lo 33)))))) 
-```
-
-To convert a cache code to an integer index:
-
-```clojure
-(defn cache-code-to-index [s]
-  (let [sz (.length s)]
-    (if (= sz 2)
-      (- (int (.charAt s 1)) 33)
-      (+ (* 94 (- (int (.charAt s 1)) 33)) (- (int (.charAt s 1)) 33))
+```java
+private static final int CACHE_CODE_NUMERALS = 94;
+private static final int BASE_CHAR_INDEX = 33;
+private static final String SUB_STR = "^";
+ 
+private String indexToCode(int index) {
+    int hi = index / CACHE_CODE_NUMERALS;
+    int lo = index % CACHE_CODE_NUMERALS;
+    if (hi == 0) {
+        return SUB_STR + (char)(lo + BASE_CHAR_INDEX);
+    } else {
+        return SUB_STR + (char)(hi + BASE_CHAR_INDEX) + (char)(lo + BASE_CHAR_INDEX);
+    }
+}
+ 
+private int codeToIndex(String s) {
+    int sz = s.length();
+    if (sz == 2) {
+        return ((int)s.charAt(1) - WriteCache.BASE_CHAR_INDEX);
+    } else {
+        return (((int)s.charAt(1) - WriteCache.BASE_CHAR_INDEX) * WriteCache.CACHE_CODE_NUMERALS) +
+                ((int)s.charAt(2) - WriteCache.BASE_CHAR_INDEX);
+    }
+}
 ```
 
 #### Write caching
@@ -246,7 +256,14 @@ The diagram below describes the transit decoding process.
 
 ![Transit Read Flow](img/TransitReadFlow.png)
 
+### MIME Types
 
+The MIME type for transit format data depends on the encoding scheme:
+
+| Encoding | MIME type |
+|:---------|:----------|
+| json / json-verbose | application/transit+json |
+| msgpack | application/transit+msgpack | 
 
 ## License
 
@@ -254,3 +271,4 @@ Copyright © 2014 Cognitect Inc
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
+
