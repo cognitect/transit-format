@@ -2,18 +2,33 @@
 
 A data interchange format.
 
-### Version
+# Rationale
 
-This is version 0.8 of the transit format.
+transit is an extensible data notation for conveying values, primarily for program-to-program communication. This spec describes transit in order to facilitate the implementation of readers and writers in a wide range of languages. 
+
+transit provides a set of basic of elements and a set of extension elements for representing values. The extension mechanism is open, allowing programs using to add new elements specific to their needs. Users of data formats without such facilities must rely on either convention or context to convey elements not included in the base set, making application code much more complicated. With transit, convention and context-sensitive logic are unnecessary. 
+
+transit is designed to be implemented on top of formats for which high performance processors already exist, specifically JSON and MessagePack. transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. transit also supports compression via caching of repeated elements, e.g., keys used in an array of maps, that can significantly reduce payload size.
+
+The design of transit is focused on program-to-program communication, as opposed to human-to-program or program-human communication. While it does support an explicit verbose mode for representing transit elements in JSON, transit is not especially well suited for situations where human readability is paramount. 
+
+transit processes elements in terms of semantic types, but it is not a type system, and has no schemas. Nor is it a system for representing objects - there are no reference types, nor should a consumer have an expectation that two equivalent elements in some body of transit will yield distinct object identities when read, unless a reader implementation goes out of its way to make such a promise. Thus the resulting values should be considered immutable, and a reader implementation should yield values that ensure this, to the extent possible. 
+
+transit is a set of definitions for acceptable elements. A use of transit might be a stream or file containing elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param. 
+
+The base set of built-in and extension elements in transit is meant to cover the basic set of data structures common to most programming languages. While transit specifies how those elements are formatted in text, it does not dictate the representation on either the producer or consumer side. A well behaved implementation library should endeavor to map the elements to programming language types with similar
+semantics. 
 
 # Specification
 
-Transit is a protocol for encoding data in JSON or MsgPack that:
-supports a rich and extensible set of types
-allows context-free parsing of typed values
-can by implemented on top of existing high-speed parsers.
+## Version
+
+This is version 0.8 of the transit specification.
+
+## Implementations
 
 There are implementations for the following languages:
+
 * [Clojure](http://github.com/cognitect/transit-clj)
 * [ClojureScript](http://github.com/cognitect/transit-cljs)
 * [Java](http://github.com/cognitect/transit-java)
@@ -23,7 +38,7 @@ There are implementations for the following languages:
 
 ## How it works
 
-Transit was created to enable sending richly typed data from one program to another, across programming language boundaries. Transit is defined in terms of an extensible set of semantic types. When data is written to transit, the language-specific transit library maps the type to one of the semantic types, then writes it out to msgpack or json using the rules defined for that type. Whenever possible, data is written directly to msgpack or json using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in msgpack or json. When a value cannot be represented directly as a built-in type in msgpack or json, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in msgpack or json, either a string or an object (map).
+Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with transit, a language-specific transit library maps the object's type to one of supported semantic types. Then it writes the object out to MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string or an object (map). 
 
 When transit data is read, any encoded values are decoded and programming language appropriate representations are produced.
 
@@ -31,13 +46,13 @@ Transit defines the rules for encoding and decoding semantically typed values. I
 
 ### Tag-based encoding
 
-When necessary, values are encoded as a tag indicating their semantic type and the value represented in a form that can be represented directly in msgpack or json or which can itself be encoded. Each of the semantic types that transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in msgpack or json, it is encoded one of two ways:
+When necessary, transit encodes values are as a tag indicating their semantic type and the value represented in a form that can be represented directly in MessagePack or JSON or which can itself be encoded. Each of the semantic types that transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in MessagePack or JSON, it is encoded one of two ways:
 * as a string  ```"~" + tag-char + value-str```
 * as an object ```{"~#tag" : value}```
 
-The table below lists all of the built-in semantic types and their corresponding tags. The rows highlighted in green represent ground types. In general, instances of ground types are represented directly in msgpack or json, although there are some exceptions. The rows in white are extended types. Instances of extended types are never represented directly in msgpack or json, they are always encoded. Whether they are encoded in string or map form depends on whether the data is a scalar or a composite as well as whether it is being written to msgpack or json. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form.
+The table below lists all of the built-in semantic types and their corresponding tags. The rows highlighted in green represent ground types. In general, instances of ground types are represented directly in MessagePack or JSON, although there are some exceptions. The rows in white are extended types. Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string or map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form.
 
-|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | msgpack | json | json-verbose (no caching) |
+|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
 |scalar| null| _ | | nil |"\_" |nil| null when not key, else "~\_" | null when not key, else "~\_" |
 |scalar| string| s | | "string" | | String | String | String |
@@ -65,7 +80,7 @@ The table below lists all of the built-in semantic types and their corresponding
 |composite| link | 	link | 	map | map with string keys: href, rel, name, render, prompt; name, render, prompt are optional; value of href is a URI, value of all other keys is a string, value of render key must be "image" or "link", as per http://amundsen.com/media-types/collection/format/#arrays-links | | {"~#link" : {"href" "~rhttp://..." "rel" "a-rel" "name" "a-name" "render" "link or image" "prompt" "a-prompt"}} | {"~#link" : ["^ ,""href", "~rhttp://...", "rel", "a-rel", "name", "a-name", "render", "link or image", "prompt", "a-prompt"]} | {"~#link" : {"href" "~rhttp://..." "rel" "a-rel" "name" "a-name" "render" "link or image" "prompt" "a-prompt"}} |
 |*composite*|*Composite extension type* | *tag* | *specify* | *rep* |  | *{"~#tag" : rep}* | *{"~#tag" : rep}* |  *{"~#tag" : rep}* |
 
-Note that there are two modes for writing data in json. In normal json mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also json-verbose mode, which is less efficient, but easier for a person to read. In json-verbose mode, caching is disabled and maps are represented as objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
+Note that there are two modes for writing data in JSON. In normal JSON mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also JSON-Verbose mode, which is less efficient, but easier for a person to read. In JSON-Verbose mode, caching is disabled and maps are represented as objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
 
 ### Special Characters
 
@@ -156,7 +171,7 @@ Applications can extend transit as necessary. There are two steps to extending t
 
 To define a new semantic type, specify its meaning, tag and representation. You can also define a string representation and a verbose representation, but they are not required. For instance, you could define a new semantic type representing a point in the Cartesian coordinate system, with the tag "point" and represented as an array of two integers x and y:
 
-|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | msgpack | json | json-verbose (no caching) |
+|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
 | scalar | point|point| array|[int int] | |{"~#point" : [int int] }|{"~#point" : [int int] }| {"~#point" : [int int] }
 
@@ -201,7 +216,7 @@ You can define extension types in terms of other extension types. Transit manage
 
 For example, imagine a circle semantic type with the tag "circle" represented as an array of its origin (a point) and radius (an integer):
 
-|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | msgpack | json | json-verbose (no caching) |
+|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
 |scalar	|circle| circle| array	|[point int] | | {"~#circle" : [point int] } | {"~#circle" : [point int] } | {"~#circle" : [point int] }
 
@@ -223,7 +238,7 @@ Here is an example of a handler and a decoder for the circle semantic type that 
   (fn [rep] (let [[origin radius] rep] (Circle. origin radius)))}
 ```
 
-The transit encoding of a circle at 10, 20 with a radius of 5 looks like this in json:
+The transit encoding of a circle at 10, 20 with a radius of 5 looks like this in JSON:
 
 ```javascript
 {"~#circle" : [{"~#point" : [10 20]}, 5]}
@@ -231,7 +246,7 @@ The transit encoding of a circle at 10, 20 with a radius of 5 looks like this in
 
 ### Quoting
 
-Some json processors only allow arrays or objects as top level forms. If you write a single scalar value using transit, it gets quoted. A quoted scalar is represented as a map on the wire:
+Some JSON processors only allow arrays or objects as top level forms. If you write a single scalar value using transit, it gets quoted. A quoted scalar is represented as a map on the wire:
 
 ```javascript
 {"~#'" : "a string"}
@@ -261,8 +276,8 @@ The MIME type for transit format data depends on the encoding scheme:
 
 | Encoding | MIME type |
 |:---------|:----------|
-| json / json-verbose | application/transit+json |
-| msgpack | application/transit+msgpack | 
+| JSON / JSON-Verbose | application/transit+json |
+| MessagePack | application/transit+msgpack | 
 
 ## License
 
