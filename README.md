@@ -14,7 +14,7 @@ The design of Transit is focused on program-to-program communication, as opposed
 
 Transit processes elements in terms of semantic types, but it is not a type system, and has no schemas. Nor is it a system for representing object graphs - there are no reference types, nor should a consumer have an expectation that two equivalent elements in some body of Transit will yield distinct object identities when read, unless a reader implementation goes out of its way to make such a promise. Thus the resulting values should be considered immutable, and a reader implementation should yield values that ensure this, to the extent possible. 
 
-Transit is a set of definitions for acceptable elements. A use of Transit might be a stream or file containing elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param. 
+Transit defines the encoding of elements. A use of transit might be a stream or file containing a series of elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param.
 
 The base set of built-in and extension elements in Transit is meant to cover the basic set of data structures common to most programming languages. While Transit specifies how those elements are formatted in text, it does not dictate the representation on either the producer or consumer side. A well behaved implementation library should endeavor to map the elements to programming language types with similar
 semantics. 
