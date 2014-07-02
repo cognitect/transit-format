@@ -16,9 +16,7 @@ Transit defines the encoding of elements. A use of transit might be a stream or 
 The base set of built-in and extension elements in Transit is meant to cover the basic set of data structures common to most programming languages. While Transit specifies how those elements are formatted in text, it does not dictate the representation on either the producer or consumer side. A well behaved implementation library should endeavor to map the elements to programming language types with similar
 semantics. 
 
-# Specification
-
-## Implementations
+# Implementations
 
 There are implementations for the following languages:
 
@@ -28,6 +26,8 @@ There are implementations for the following languages:
 * [JS](http://github.com/cognitect/transit-js)
 * [Python](http://github.com/cognitect/transit-python)
 * [Ruby](http://github.com/cognitect/transit-ruby)
+
+# Specification
 
 ## How it works
 
