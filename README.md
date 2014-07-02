@@ -18,10 +18,6 @@ semantics.
 
 # Specification
 
-## Version
-
-This is version 0.8 of the Transit specification.
-
 ## Implementations
 
 There are implementations for the following languages:
