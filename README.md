@@ -1,29 +1,29 @@
-# transit
+# Transit
 
 A data interchange format.
 
 # Rationale
 
-transit is an extensible data notation for conveying values, primarily for program-to-program communication. This spec describes transit in order to facilitate the implementation of readers and writers in a wide range of languages. 
+Transit is an extensible data notation for conveying values, primarily for program-to-program communication. This spec describes Transit in order to facilitate the implementation of readers and writers in a wide range of languages. 
 
-transit provides a set of basic of elements and a set of extension elements for representing values. The extension mechanism is open, allowing programs using to add new elements specific to their needs. Users of data formats without such facilities must rely on either convention or context to convey elements not included in the base set, making application code much more complicated. With transit, convention and context-sensitive logic are unnecessary. 
+Transit provides a set of basic of elements and a set of extension elements for representing values. The extension mechanism is open, allowing programs using to add new elements specific to their needs. Users of data formats without such facilities must rely on either convention or context to convey elements not included in the base set, making application code much more complicated. With Transit, convention and context-sensitive logic are unnecessary. 
 
-transit is designed to be implemented on top of formats for which high performance processors already exist, specifically JSON and MessagePack. transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. transit also supports compression via caching of repeated elements, e.g., keys used in an array of maps, that can significantly reduce payload size.
+Transit is designed to be implemented on top of formats for which high performance processors already exist, specifically JSON and MessagePack. Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Transit also supports compression via caching of repeated elements, e.g., keys used in an array of maps, that can significantly reduce payload size.
 
-The design of transit is focused on program-to-program communication, as opposed to human-to-program or program-human communication. While it does support an explicit verbose mode for representing transit elements in JSON, transit is not especially well suited for situations where human readability is paramount. 
+The design of Transit is focused on program-to-program communication, as opposed to human-to-program or program-human communication. While it does support an explicit verbose mode for representing Transit elements in JSON, Transit is not especially well suited for situations where human readability is paramount. 
 
-transit processes elements in terms of semantic types, but it is not a type system, and has no schemas. Nor is it a system for representing objects - there are no reference types, nor should a consumer have an expectation that two equivalent elements in some body of transit will yield distinct object identities when read, unless a reader implementation goes out of its way to make such a promise. Thus the resulting values should be considered immutable, and a reader implementation should yield values that ensure this, to the extent possible. 
+Transit processes elements in terms of semantic types, but it is not a type system, and has no schemas. Nor is it a system for representing objects - there are no reference types, nor should a consumer have an expectation that two equivalent elements in some body of Transit will yield distinct object identities when read, unless a reader implementation goes out of its way to make such a promise. Thus the resulting values should be considered immutable, and a reader implementation should yield values that ensure this, to the extent possible. 
 
-transit is a set of definitions for acceptable elements. A use of transit might be a stream or file containing elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param. 
+Transit is a set of definitions for acceptable elements. A use of Transit might be a stream or file containing elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param. 
 
-The base set of built-in and extension elements in transit is meant to cover the basic set of data structures common to most programming languages. While transit specifies how those elements are formatted in text, it does not dictate the representation on either the producer or consumer side. A well behaved implementation library should endeavor to map the elements to programming language types with similar
+The base set of built-in and extension elements in Transit is meant to cover the basic set of data structures common to most programming languages. While Transit specifies how those elements are formatted in text, it does not dictate the representation on either the producer or consumer side. A well behaved implementation library should endeavor to map the elements to programming language types with similar
 semantics. 
 
 # Specification
 
 ## Version
 
-This is version 0.8 of the transit specification.
+This is version 0.8 of the Transit specification.
 
 ## Implementations
 
@@ -33,20 +33,20 @@ There are implementations for the following languages:
 * [ClojureScript](http://github.com/cognitect/transit-cljs)
 * [Java](http://github.com/cognitect/transit-java)
 * [JS](http://github.com/cognitect/transit-js)
-* [Python](http://github.com/cognitect/tranist-python)
+* [Python](http://github.com/cognitect/transit-python)
 * [Ruby](http://github.com/cognitect/transit-ruby)
 
 ## How it works
 
-Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with transit, a language-specific transit library maps the object's type to one of supported semantic types. Then it writes the object out to MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string or an object (map). 
+Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of supported semantic types. Then it writes the object out to MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string or an object (map). 
 
-When transit data is read, any encoded values are decoded and programming language appropriate representations are produced.
+When Transit data is read, any encoded values are decoded and programming language appropriate representations are produced.
 
 Transit defines the rules for encoding and decoding semantically typed values. It does not define how encoded data is stored, transmitted, or otherwise used.
 
 ### Tag-based encoding
 
-When necessary, transit encodes values are as a tag indicating their semantic type and the value represented in a form that can be represented directly in MessagePack or JSON or which can itself be encoded. Each of the semantic types that transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in MessagePack or JSON, it is encoded one of two ways:
+When necessary, Transit encodes values are as a tag indicating their semantic type and the value represented in a form that can be represented directly in MessagePack or JSON or which can itself be encoded. Each of the semantic types that Transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in MessagePack or JSON, it is encoded one of two ways:
 * as a string  ```"~" + tag-char + value-str```
 * as an object ```{"~#tag" : value}```
 
@@ -143,7 +143,7 @@ On the writing side, the cache is implemented as two data structures: an increme
 | "~$baz"|	"^2"|
 |...|...|
 
-The first time a cacheable value is written, transit adds an entry to to the cache map, increments the counter and writes the original value. If the counter wraps to 0, the map is discarded and process starts again. The next time the cacheable value is encountered, the cache code is written instead.
+The first time a cacheable value is written, Transit adds an entry to to the cache map, increments the counter and writes the original value. If the counter wraps to 0, the map is discarded and process starts again. The next time the cacheable value is encountered, the cache code is written instead.
 
 #### Read caching
 
@@ -161,13 +161,13 @@ On the reading side, the cache is also implemented as two data structures: an in
 |5|:bar
 |...|...
 
-The first time a cacheable value is read, transit adds an entry to the cache array, increments the counter and processes the original value. If the counter wraps, the process starts again from 0. When a cache code is read, the corresponding original value is retrieved from the indicated index in the read cache.
+The first time a cacheable value is read, Transit adds an entry to the cache array, increments the counter and processes the original value. If the counter wraps, the process starts again from 0. When a cache code is read, the corresponding original value is retrieved from the indicated index in the read cache.
 
 Because the writer and the reader encounter cacheable values in the same order, cache code generation stays in sync.
 
 ### Extensibility
 
-Applications can extend transit as necessary. There are two steps to extending transit: defining a new semantic type and adding handlers and decoders to map from / to programming language types.
+Applications can extend Transit as necessary. There are two steps to extending Transit: defining a new semantic type and adding handlers and decoders to map from / to programming language types.
 
 To define a new semantic type, specify its meaning, tag and representation. You can also define a string representation and a verbose representation, but they are not required. For instance, you could define a new semantic type representing a point in the Cartesian coordinate system, with the tag "point" and represented as an array of two integers x and y:
 
@@ -177,7 +177,7 @@ To define a new semantic type, specify its meaning, tag and representation. You 
 
 Once the semantic type is defined, you can create handlers and decoders.
 
-A handler maps values of a programming language type to values of a transit semantic type. A handler is a logical interface with the following operations (details differ by programming language):
+A handler maps values of a programming language type to values of a Transit semantic type. A handler is a logical interface with the following operations (details differ by programming language):
 
 |Operation|Args|Notes
 |:--------|:---|:----
@@ -188,9 +188,9 @@ A handler maps values of a programming language type to values of a transit sema
 
 A handler for an extension type must implement the rep operation. Transit calls rep to get an encodable representation of a value. The encodable representation may be any type for which a handler exists OR a type that can be mapped directly to a ground semantic type. The tag rep column in the semantic type table above lists the programming language types that map directly to ground types without requiring handlers (for instance, an iterable maps directly to an array). Transit implementations provide an as-tag function to allow you to specify a particular tag and rep to use to represent an extension type, if that is more efficient than representing an extension type using a type for which a handler exists. For example, you can represent an extension type as an array by either having rep return an array (for which there is a handler) or by having it return an as-tag value with the tag "array" and an iterable value as the rep. 
 
-A decoder maps values of a transit semantic type to values of a programming language type. A decoder is a logical function that constructs a new value from a representation (details differ by programming language).
+A decoder maps values of a Transit semantic type to values of a programming language type. A decoder is a logical function that constructs a new value from a representation (details differ by programming language).
 
-Maps are used to associate handlers with programming language types and decoders with transit tags.
+Maps are used to associate handlers with programming language types and decoders with Transit tags.
 
 Here is an example of a handler and a decoder for the point semantic type that map from/to a Point record type in Clojure:
 
@@ -238,7 +238,7 @@ Here is an example of a handler and a decoder for the circle semantic type that 
   (fn [rep] (let [[origin radius] rep] (Circle. origin radius)))}
 ```
 
-The transit encoding of a circle at 10, 20 with a radius of 5 looks like this in JSON:
+The Transit encoding of a circle at 10, 20 with a radius of 5 looks like this in JSON:
 
 ```javascript
 {"~#circle" : [{"~#point" : [10 20]}, 5]}
@@ -246,7 +246,7 @@ The transit encoding of a circle at 10, 20 with a radius of 5 looks like this in
 
 ### Quoting
 
-Some JSON processors only allow arrays or objects as top level forms. If you write a single scalar value using transit, it gets quoted. A quoted scalar is represented as a map on the wire:
+Some JSON processors only allow arrays or objects as top level forms. If you write a single scalar value using Transit, it gets quoted. A quoted scalar is represented as a map on the wire:
 
 ```javascript
 {"~#'" : "a string"}
@@ -256,23 +256,23 @@ Transit handles quoting scalars on write and unquoting them on read as necessary
 
 ### TaggedValues
 
-It is possible that transit encoded data will contain a semantic type that a processing application does not have a decoder for. In that case, the encoded value cannot be decoded and is returned as an instance of a special TaggedValue type with two properties, a tag and a value (details vary by programming language). TaggedValues can be inspected by application code if required. If a TaggedValue instance is written with transit, the tag and value are used for the encoded form. ensuring that TaggedValues roundtrip correctly.
+It is possible that Transit encoded data will contain a semantic type that a processing application does not have a decoder for. In that case, the encoded value cannot be decoded and is returned as an instance of a special TaggedValue type with two properties, a tag and a value (details vary by programming language). TaggedValues can be inspected by application code if required. If a TaggedValue instance is written with Transit, the tag and value are used for the encoded form. ensuring that TaggedValues roundtrip correctly.
 
 ### Write Flow
 
-The diagram below describes the transit encoding process.
+The diagram below describes the Transit encoding process.
 
 ![Transit Write Flow](img/TransitWriteFlow.png)
 
 ### Read Flow
 
-The diagram below describes the transit decoding process.
+The diagram below describes the Transit decoding process.
 
 ![Transit Read Flow](img/TransitReadFlow.png)
 
 ### MIME Types
 
-The MIME type for transit format data depends on the encoding scheme:
+The MIME type for Transit format data depends on the encoding scheme:
 
 | Encoding | MIME type |
 |:---------|:----------|
@@ -283,5 +283,5 @@ The MIME type for transit format data depends on the encoding scheme:
 
 Copyright © 2014 Cognitect Inc
 
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type">Transit Format Specification</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://transit-format.org" property="cc:attributionName" rel="cc:attributionURL">Cognitect</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type">Transit Format Specification</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://transit<-format.org" property="cc:attributionName" rel="cc:attributionURL">Cognitect</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
 
