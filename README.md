@@ -1,11 +1,8 @@
 # Transit
 
-A data interchange format.
-
-# Rationale
+## Rationale
 
 Transit is an extensible data notation for conveying values, primarily for program-to-program communication. This spec describes Transit in order to facilitate the implementation of readers and writers in a wide range of languages. 
-
 Transit provides a set of basic of elements and a set of extension elements for representing values. The extension mechanism is open, allowing programs using to add new elements specific to their needs. Users of data formats without such facilities must rely on either convention or context to convey elements not included in the base set, making application code much more complicated. With Transit, convention and context-sensitive logic are unnecessary. 
 
 Transit is designed to be implemented on top of formats for which high performance processors already exist, specifically JSON and MessagePack. Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Transit also supports compression via caching of repeated elements, e.g., keys used in an array of maps, that can significantly reduce payload size.
