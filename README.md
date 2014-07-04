@@ -2,23 +2,27 @@
 
 *Version:* 0.8
 
-Transit is an extensible data notation for conveying values, primarily for program-to-program communication. This spec describes Transit in order to facilitate the implementation of readers and writers in a wide range of languages. 
-Transit provides a set of basic of elements and a set of extension elements for representing values. The extension mechanism is open, allowing programs using to add new elements specific to their needs. Users of data formats without such facilities must rely on either convention or context to convey elements not included in the base set, making application code much more complicated. With Transit, convention and context-sensitive logic are unnecessary. 
+# Rationale
 
-Transit is designed to be implemented on top of formats for which high performance processors already exist, specifically JSON and MessagePack. Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Transit also supports compression via caching of repeated elements, e.g., keys used in an array of maps, that can significantly reduce payload size.
+Transit is a format and set of libraries for conveying values between applications written in different programming languages. This spec describes Transit in order to facilitate the implementation of encoders and decoders in a wide range of languages. 
 
-The design of Transit is focused on program-to-program communication, as opposed to human readability. While it does support an explicit verbose mode for representing Transit elements in JSON, Transit is not especially well suited for situations where human readability is paramount. 
+Transit provides a set of basic of elements and a set of extension elements for representing values. The extension mechanism is open, allowing programs using to add new elements specific to their needs. Users of data formats without such facilities must rely on either schemas, convention or context to convey elements not included in the base set, making application code much more complex. With Transit, schemas, convention and context-sensitive logic are not required. 
 
-Transit processes elements in terms of semantic types, but it is not a type system, and has no schemas. Nor is it a system for representing object graphs - there are no reference types, nor should a consumer have an expectation that two equivalent elements in some body of Transit will yield distinct object identities when read, unless a reader implementation goes out of its way to make such a promise. Thus the resulting values should be considered immutable, and a reader implementation should yield values that ensure this, to the extent possible. 
+Transit is designed to be implemented as an encoding on top of formats for which high performance processors already exist, specifically JSON and MessagePack. Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Extension always bottoms out on built-in types, there are no opaque binary blobs. Thus Transit format can always be decoded, and can be subject to editing, transformation and search operations, even by applications which do not 'know about' particular extension tags. In this sense, Transit is self-describing.
 
-Transit defines the encoding of elements. A use of transit might be a stream or file containing a series of elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param.
+Transit also supports compression via caching of repeated elements, e.g., map keys, that can significantly reduce payload size and decoding time, as well as memory in the resulting application representation.
 
-The base set of built-in and extension elements in Transit is meant to cover the basic set of data structures common to most programming languages. While Transit specifies how those elements are formatted in text, it does not dictate the representation on either the producer or consumer side. A well behaved implementation library should endeavor to map the elements to programming language types with similar
-semantics. 
+The design of Transit is focused on program-to-program communication, as opposed to human readability. While it does support an explicit verbose mode for representing Transit elements in JSON, Transit is not targeted for situations where human readability is paramount. 
+
+Transit processes elements in terms of semantic types, but it is not a type system, and has no schemas. Nor is it a system for representing object graphs - there are no reference types nor identity, nor should a consumer have an expectation that two equivalent elements in some body of Transit will yield distinct object identities when read, unless a reader implementation goes out of its way to make such a promise. Thus the resulting values should be considered immutable, and a reader implementation should yield values that ensure this, to the extent possible. 
+
+Transit defines the encoding of elements. There is no enclosing element required at the top level. Thus Transit is suitable for streaming and interactive applications. A use of transit might be a stream or file containing a series of elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param.
+
+The base set of built-in and extension elements in Transit is meant to cover the basic set of data structures common to most programming languages. While Transit specifies how those elements are encoded, it does not dictate the application memory/object representation on either the producer or consumer side. A well behaved implementation library should endeavor to map the elements to common programming language types with similar semantics. 
 
 # Implementations
 
-There are implementations for the following languages:
+There are currently implementations for the following languages:
 
 * [Clojure](http://github.com/cognitect/transit-clj)
 * [ClojureScript](http://github.com/cognitect/transit-cljs)
@@ -31,7 +35,7 @@ There are implementations for the following languages:
 
 ## How it works
 
-Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of supported semantic types. Then it writes the object out to MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string or an object (map). 
+Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of supported semantic types. Then it encodes the value into MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string or a map/JSON-object. 
 
 When Transit data is read, any encoded values are decoded and programming language appropriate representations are produced.
 
