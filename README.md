@@ -1,10 +1,10 @@
 # Transit 
 
+Transit is a format and set of libraries for conveying values between applications written in different programming languages. This spec describes Transit in order to facilitate the implementation of encoders and decoders in a wide range of languages. 
+
 *Version:* 0.8
 
 # Rationale
-
-Transit is a format and set of libraries for conveying values between applications written in different programming languages. This spec describes Transit in order to facilitate the implementation of encoders and decoders in a wide range of languages. 
 
 Transit provides a set of basic of elements and a set of extension elements for representing values. The extension mechanism is open, allowing programs using to add new elements specific to their needs. Users of data formats without such facilities must rely on either schemas, convention or context to convey elements not included in the base set, making application code much more complex. With Transit, schemas, convention and context-sensitive logic are not required. 
 
