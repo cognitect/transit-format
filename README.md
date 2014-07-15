@@ -1,12 +1,12 @@
 # Transit 
 
-Transit is a format and set of libraries for conveying values between applications written in different programming languages. This spec describes Transit in order to facilitate the implementation of encoders and decoders in a wide range of languages. 
+Transit is a format and set of libraries for conveying values between applications written in different programming languages. This spec describes Transit in order to facilitate its implementation in a wide range of languages. 
 
 *Version:* 0.8
 
 # Rationale
 
-Transit provides a set of basic of elements and a set of extension elements for representing values. The extension mechanism is open, allowing programs using to add new elements specific to their needs. Users of data formats without such facilities must rely on either schemas, convention or context to convey elements not included in the base set, making application code much more complex. With Transit, schemas, convention and context-sensitive logic are not required. 
+Transit provides a set of basic of elements and a set of extension elements for representing typed values. The extension mechanism is open, allowing programs using Transit to add new elements specific to their needs. Users of data formats without such facilities must rely on either schemas, convention or context to convey elements not included in the base set, making application code much more complex. With Transit, schemas, convention and context-sensitive logic are not required. 
 
 Transit is designed to be implemented as an encoding on top of formats for which high performance processors already exist, specifically JSON and MessagePack. Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Extension always bottoms out on built-in types, there are no opaque binary blobs. Thus Transit format can always be decoded, and can be subject to editing, transformation and search operations, even by applications which do not 'know about' particular extension tags. In this sense, Transit is self-describing.
 
@@ -35,7 +35,7 @@ There are currently implementations for the following languages:
 
 ## How it works
 
-Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of supported semantic types. Then it encodes the value into MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string or a map/JSON-object. 
+Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of supported semantic types. Then it encodes the value into MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string, a two element array or a map/JSON-object. 
 
 When Transit data is read, any encoded values are decoded and programming language appropriate representations are produced.
 
@@ -43,39 +43,46 @@ Transit defines the rules for encoding and decoding semantically typed values. I
 
 ### Tag-based encoding
 
-When necessary, Transit encodes values are as a tag indicating their semantic type and the value represented in a form that can be represented directly in MessagePack or JSON or which can itself be encoded. Each of the semantic types that Transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in MessagePack or JSON, it is encoded one of two ways:
-* as a string  ```"~" + tag-char + value-str```
+When necessary, Transit encodes values as a tag indicating their semantic type and the value in a form that can be represented directly in MessagePack or JSON, or which can itself be further encoded. Each of the semantic types that Transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in MessagePack or JSON, it is encoded one of three ways:
+* as a string ```"~" + tag-char + value-str```
+* as an array ```["~#tag", value]```
 * as an object ```{"~#tag" : value}```
 
-The table below lists all of the built-in semantic types and their corresponding tags. The rows highlighted in green represent ground types. In general, instances of ground types are represented directly in MessagePack or JSON, although there are some exceptions. The rows in white are extended types. Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string or map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form.
+The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. In general, instances of ground types are represented directly in MessagePack or JSON, although there are some exceptions. Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string, array or map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
+
+**Scalar Types**
 
 |   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
-|scalar| null| _ | | nil |"\_" |nil| null when not key, else "~\_" | null when not key, else "~\_" |
-|scalar| string| s | | "string" | | String | String | String |
-|scalar| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"|
-|scalar|integer (< signed 64 bit)| i| | integer| "123"| smallest int that holds value | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
-|scalar|decimal| d| |  floating pt number | "123.456" | float32 | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
-|scalar| bytes | b | | byte array | "base64"|  "~bbase64" | "~bbase64" | "~bbase64" |
-|scalar| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key" |
-|scalar| symbol | $ |s| "sym"| | "~$sym"| "~$sym"| "~$sym" |
-|scalar| big decimal| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
-|scalar| big integer|	n|	s|	"123"| |	"~n1234"|	"~n1234"|	"~n1234" |
-|scalar| time |m| i| int msecs| "1234566789" | {"~#m" : int}|  "~m123456789" | N/A  |
-|scalar| time |t |s| "1985-04-12T23:20:50.52Z"| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
-|scalar| uuid | u | s or array|  [int int]|  "531a379e-31bb-4ce1-8690-158dceb64be6"|  {"~#u" : [hi64 lo64]}|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
-|scalar| uri| r| s| | "http://..."| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
-|scalar| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
-|scalar|Scalar extension type | X|  specify or s | "arep" or arep|  "arep" | "~Xarep" or {"~#X" : arep}|  "~Xarep" or {"~#X" : arep} | "~Xarep" or {"~#X" : arep} |
-|scalar| quoted scalar| ' | | scalar value| NA|	{"~#'" : scalar } | {"~#'" : scalar } | {"~#'" : scalar } |
-|composite| array | array | | iterable | |  Array |  Array |  Array |
-|composite| map |  map |  |  iterable &lt;map entry> |  |  Object  | Array: ["^ " k1 v1 k2 v2 ...] |  Object |
-|composite| set |  set |  array  | [vals...] |  |  {"~#set" : [vals ...]} |  {"~#set" : [vals ...]} |  {"~#set" : [vals ...]} |
-|composite| list |  list |  array |  [vals...] |  |  {"~#list" : [vals ...]} |  {"~#list" : [vals ...]} |  {"~#list" : [vals ...]} |
-|composite| map w/ composite keys |  cmap |  array |  [k1 v1 k2 v2 ...] |  |  {"~#cmap" : [k1 v1 k2 v2 ...]} |  {"~#cmap" : [k1 v1 k2 v2 ...]} |  {"~#cmap" : [k1 v1 k2 v2 ...]} |
-|composite| typed array (ints, floats, ...) |  ints, floats, ...  |  array |  [vals ...] |  |  {"~#ints" : [vals ...]} |  {"~#ints" : [vals ...]} |  {"~#ints" : [vals ...]} |
-|composite| link | 	link | 	map | map with string keys: href, rel, name, render, prompt; name, render, prompt are optional; value of href is a URI, value of all other keys is a string, value of render key must be "image" or "link", as per http://amundsen.com/media-types/collection/format/#arrays-links | | {"~#link" : {"href" "~rhttp://..." "rel" "a-rel" "name" "a-name" "render" "link or image" "prompt" "a-prompt"}} | {"~#link" : ["^ ,""href", "~rhttp://...", "rel", "a-rel", "name", "a-name", "render", "link or image", "prompt", "a-prompt"]} | {"~#link" : {"href" "~rhttp://..." "rel" "a-rel" "name" "a-name" "render" "link or image" "prompt" "a-prompt"}} |
-|*composite*|*Composite extension type* | *tag* | *specify* | *rep* |  | *{"~#tag" : rep}* | *{"~#tag" : rep}* |  *{"~#tag" : rep}* |
+|ground| null| _ | | nil |"\_" |nil| null when not key, else "~\_" | null when not key, else "~\_" |
+|ground| string| s | | "string" | | String | String | String |
+|ground| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"|
+|ground|integer (< signed 64 bit)| i| | integer| "123"| smallest int that holds value | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
+|ground|decimal| d| |  floating pt number | "123.456" | float32 | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
+|ground| bytes | b | | byte array | "base64"|  "~bbase64" | "~bbase64" | "~bbase64" |
+|extension| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key" |
+|extension| symbol | $ |s| "sym"| | "~$sym"| "~$sym"| "~$sym" |
+|extension| big decimal| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
+|extension| big integer|	n|	s|	"123"| |	"~n1234"|	"~n1234"|	"~n1234" |
+|extension| time |m| i| int msecs| "1234566789" | ["~#m", int]|  "~m123456789" | N/A  |
+|extension| time |t |s| "1985-04-12T23:20:50.52Z"| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
+|extension| uuid | u | s or array|  [int, int]|  "531a379e-31bb-4ce1-8690-158dceb64be6"|  ["~#u", [hi64, lo64]]|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
+|extension| uri| r| s| | "http://..."| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
+|extension| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
+|extension| quoted scalar| ' | | scalar value| NA|	["~#'", scalar] | ["~#'", scalar] | {"~#'" : scalar } |
+|*extension*|*Scalar extension type* | *X*| *specify or s* | *"arep" or arep*|  *"arep"* | *"~Xarep" or ["~#X", arep]*| *"~Xarep" or ["~#X", arep]* | *"~Xarep" or ["~#X", arep]* |
+
+**Composite Types**
+
+|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
+|:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
+|ground| array | array | | iterable | |  Array |  Array |  Array |
+|ground| map |  map |  |  iterable &lt;map entry> |  |  Object  | Array: ["^ ", k1, v1, ...] |  Object |
+|extension| set |  set |  array  | [vals...] |  |  ["~#set", [vals ...]] |  ["~#set", [vals ...]] |  {"~#set" : [vals ...]} |
+|extension| list |  list |  array |  [vals...] |  |  ["~#list", [vals ...]] |  ["~#list", [vals ...]] |  {"~#list" : [vals ...]} |
+|extension| map w/ composite keys |  cmap |  array |  [k1, v1, ...] |  |  ["~#cmap", [k1, v1, ...]] |  ["~#cmap", [k1, v1, ...]] |  {"~#cmap" : [k1, v1, ...]} |
+|extension| link | 	link | 	map | map with string keys: href, rel, name, render, prompt; name, render, prompt are optional; value of href is a URI, value of all other keys is a string, value of render key must be "image" or "link", as per http://amundsen.com/media-types/collection/format/#arrays-links | | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | {"~#link" : {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}} |
+|*extension*|*Composite extension type* | *tag* | *specify* | *rep* |  | *{"~#tag" : rep}* | *{"~#tag" : rep}* |  *{"~#tag" : rep}* |
 
 Note that there are two modes for writing data in JSON. In normal JSON mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also JSON-Verbose mode, which is less efficient, but easier for a person to read. In JSON-Verbose mode, caching is disabled and maps are represented as objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
 
@@ -87,7 +94,7 @@ Transit relies on a small number of character sequences to encode specific infor
 |:----|:----|:----
 |~|string tag|followed by single char, upper-case reserved for app extensions, then string value
 |~#|tag|followed by tag name, one or more chars
-|^|cache|followed by one or two chars in range 33-126 (see Caching below) 
+|^|cache|followed by one or two chars (see Caching below) 
 |"^ "|map-as-array marker|when it is first item in array, indicates array represents a map
 |`|reserved|save backquote for expansion, escaped for now
 
@@ -99,16 +106,16 @@ Transit implements a caching stream to compress repetitive data. Specifically, a
 
 #### Cache codes
 
-Cache codes are generated using an increasing integer index. The number is converted to a one or two digit string expressed ASCII 33-126 for numerals with a "^" prefix, i.e., "^c" or "^cc". Since there are 94 numerals and up to 2 digits, the possible range of cache codes is from 0 to 94^2. The code below shows how to convert back and forth between integer indexes and the corresponding cache codes.
+Cache codes are generated using an increasing integer index. The number is converted to a one or two digit string expressed ASCII 44-91, inclusive, for numerals with a "^" prefix, i.e., "^c" or "^cc". Since there are 44 numerals and up to 2 digits, the possible range of cache codes is from 0 to 44^2. The code below shows how to convert back and forth between integer indexes and the corresponding cache codes.
 
 ```java
-private static final int CACHE_CODE_NUMERALS = 94;
-private static final int BASE_CHAR_INDEX = 33;
+private static final int CACHE_CODE_DIGITS = 44;
+private static final int BASE_CHAR_INDEX = 48;
 private static final String SUB_STR = "^";
  
 private String indexToCode(int index) {
-    int hi = index / CACHE_CODE_NUMERALS;
-    int lo = index % CACHE_CODE_NUMERALS;
+    int hi = index / CACHE_CODE_DIGITS;
+    int lo = index % CACHE_CODE_DIGITS;
     if (hi == 0) {
         return SUB_STR + (char)(lo + BASE_CHAR_INDEX);
     } else {
@@ -121,7 +128,7 @@ private int codeToIndex(String s) {
     if (sz == 2) {
         return ((int)s.charAt(1) - WriteCache.BASE_CHAR_INDEX);
     } else {
-        return (((int)s.charAt(1) - WriteCache.BASE_CHAR_INDEX) * WriteCache.CACHE_CODE_NUMERALS) +
+        return (((int)s.charAt(1) - WriteCache.BASE_CHAR_INDEX) * WriteCache.CACHE_CODE_DIGITS) +
                 ((int)s.charAt(2) - WriteCache.BASE_CHAR_INDEX);
     }
 }
@@ -170,24 +177,26 @@ To define a new semantic type, specify its meaning, tag and representation. You 
 
 |   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
-| scalar | point|point| array|[int int] | |{"~#point" : [int int] }|{"~#point" : [int int] }| {"~#point" : [int int] }
+| extension | point|point| array|[int, int] | |["~#point", [int, int] ]|["~#point", [int, int] ]| {"~#point" : [int, int] }
 
 Once the semantic type is defined, you can create handlers and decoders.
 
-A handler maps values of a programming language type to values of a Transit semantic type. A handler is a logical interface with the following operations (details differ by programming language):
+A *write handler* maps values of a programming language type to values of a Transit semantic type. A write handler is a logical interface with the following operations (details differ by programming language):
 
 |Operation|Args|Notes
 |:--------|:---|:----
 |tag|object|return tag for object
 |rep|object|return encodable representation of object
 |stringRep|object|return string representation of object
-|verboseHandler|&lt;none>|return an alternate handler to use in verbose mode to produce a more readable representation
+|getVerboseHandler|&lt;none>|return an alternate handler to use in verbose mode to produce a more readable representation
 
-A handler for an extension type must implement the rep operation. Transit calls rep to get an encodable representation of a value. The encodable representation may be any type for which a handler exists OR a type that can be mapped directly to a ground semantic type. The tag rep column in the semantic type table above lists the programming language types that map directly to ground types without requiring handlers (for instance, an iterable maps directly to an array). Transit implementations provide an as-tag function to allow you to specify a particular tag and rep to use to represent an extension type, if that is more efficient than representing an extension type using a type for which a handler exists. For example, you can represent an extension type as an array by either having rep return an array (for which there is a handler) or by having it return an as-tag value with the tag "array" and an iterable value as the rep. 
+A write handler for an extension type must implement the rep operation. Transit calls rep to get an encodable representation of a value. The encodable representation may be any type for which a handler exists OR a type that can be mapped directly to a ground semantic type. The tag rep column in the semantic type table above lists the programming language types that map directly to ground types without requiring handlers (for instance, an iterable maps directly to an array). Transit implementations provide an tagged-value function to allow you to specify a particular tag and rep to use to represent an extension type, if that is more efficient than representing an extension type using a type for which a handler exists. For example, you can represent an extension type as an array by either having rep return an array (for which there is a handler) or by having it return an tagged-value with the tag "array" and an iterable value as the rep. 
 
-A decoder maps values of a Transit semantic type to values of a programming language type. A decoder is a logical function that constructs a new value from a representation (details differ by programming language).
+Maps are used to associate programming language types with write handlers.
 
-Maps are used to associate handlers with programming language types and decoders with Transit tags.
+A *read handler* maps values of a Transit semantic type to values of a programming language type. A read handler is a logical function that constructs a new value from a representation (details differ by programming language).
+
+Maps are used to associate Transit tags with read handlers.
 
 Here is an example of a handler and a decoder for the point semantic type that map from/to a Point record type in Clojure:
 
@@ -215,7 +224,7 @@ For example, imagine a circle semantic type with the tag "circle" represented as
 
 |   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
-|scalar	|circle| circle| array	|[point int] | | {"~#circle" : [point int] } | {"~#circle" : [point int] } | {"~#circle" : [point int] }
+|extension	|circle| circle| array	|[point, int] | | ["~#circle", [point, int]] | ["~#circle", [point, int] ] | {"~#circle" : [point, int] }
 
 Here is an example of a handler and a decoder for the circle semantic type that map from/to a Circle record type in Clojure:
 
@@ -238,7 +247,7 @@ Here is an example of a handler and a decoder for the circle semantic type that 
 The Transit encoding of a circle at 10, 20 with a radius of 5 looks like this in JSON:
 
 ```javascript
-{"~#circle" : [{"~#point" : [10 20]}, 5]}
+["~#circle", [ ["~#point", [10, 20] ], 5] ]
 ```
 
 ### Quoting
