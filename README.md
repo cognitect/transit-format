@@ -31,7 +31,7 @@ There are currently implementations for the following languages:
 * [Python](http://github.com/cognitect/transit-python)
 * [Ruby](http://github.com/cognitect/transit-ruby)
 
-_Transit is a work in progress and may evolve based on feedback. As a result, while Transit is a great option for transferring data between applications, it should not yet be used for storing data durably over time. This recommendation will change when the specification is complete._
+_NOTE: Transit is a work in progress and may evolve based on feedback. As a result, while Transit is a great option for transferring data between applications, it should not yet be used for storing data durably over time. This recommendation will change when the specification is complete._
 
 # Specification
 
