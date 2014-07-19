@@ -61,17 +61,17 @@ The two tables below lists all of the built-in semantic types and their correspo
 |ground| null| _ | | nil |"\_" |nil| null when not key, else "~\_" | null when not key, else "~\_" |
 |ground| string| s | | "string" | | String | String | String |
 |ground| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"|
-|ground|integer (< signed 64 bit)| i| | integer| "123"| smallest int that holds value | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
-|ground|decimal| d| |  floating pt number | "123.456" | float32 | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
-|ground| bytes | b | | byte array | "base64"|  "~bbase64" | "~bbase64" | "~bbase64" |
+|ground| integer, signed 64 bit| i| | integer | "123"| smallest int that holds value | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
+|ground|floating pt decimal| d| |  floating pt number | "123.456" | smallest float that holds value | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
+|ground| bytes [(RFC 4648)](http://www.ietf.org/rfc/rfc4648.txt)| b | | base64 encoded bytes | "base64 encoded bytes"|  "~bbase64" | "~bbase64" | "~bbase64" |
 |extension| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key" |
 |extension| symbol | $ |s| "sym"| | "~$sym"| "~$sym"| "~$sym" |
 |extension| big decimal| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
 |extension| big integer|	n|	s|	"123"| |	"~n1234"|	"~n1234"|	"~n1234" |
-|extension| time |m| i| int msecs| "1234566789" | ["~#m", int]|  "~m123456789" | N/A  |
-|extension| time |t |s| "1985-04-12T23:20:50.52Z"| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
-|extension| uuid | u | s or array|  [int, int]|  "531a379e-31bb-4ce1-8690-158dceb64be6"|  ["~#u", [hi64, lo64]]|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
-|extension| uri| r| s| | "http://..."| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
+|extension| time |m| i| int msecs since 1970 | "1234566789" | ["~#m", int]|  "~m123456789" | N/A  |
+|extension| time [(RFC 3339)](http://www.ietf.org/rfc/rfc3339.txt)|t |s| "1985-04-12T23:20:50.52Z"| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
+|extension| uuid [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)| u | s or array|  [int, int]|  "531a379e-31bb-4ce1-8690-158dceb64be6"|  ["~#u", [hi64, lo64]]|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
+|extension| uri [(RFC 3986)](http://www.ietf.org/rfc/rfc3986.txt)| r| s| | "http://..."| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
 |extension| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
 |extension| quoted scalar| ' | | scalar value| NA|	["~#'", scalar] | ["~#'", scalar] | {"~#'" : scalar } |
 |*extension*|*Scalar extension type* | *X*| *specify or s* | *"arep" or arep*|  *"arep"* | *"~Xarep" or ["~#X", arep]*| *"~Xarep" or ["~#X", arep]* | *"~Xarep" or ["~#X", arep]* |
