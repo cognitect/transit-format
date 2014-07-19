@@ -52,6 +52,8 @@ When necessary, Transit encodes values as a tag indicating their semantic type a
 * as an array ```["~#tag", value]```
 * as a JSON object ```{"~#tag" : value}```
 
+![Transit Overview](img/transit-overview.png)
+
 The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. In general, instances of ground types are represented directly in MessagePack or JSON, although there are some exceptions. Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string, array or object/map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
 
 **Scalar Types**
