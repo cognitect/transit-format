@@ -8,7 +8,7 @@ Transit is a format and set of libraries for conveying values between applicatio
 
 Transit provides a set of basic of elements and a set of extension elements for representing typed values. The extension mechanism is open, allowing programs using Transit to add new elements specific to their needs. Users of data formats without such facilities must rely on either schemas, convention or context to convey elements not included in the base set, making application code much more complex. With Transit, schemas, convention and context-sensitive logic are not required. 
 
-Transit is designed to be implemented as an encoding on top of formats for which high performance processors already exist, specifically JSON and MessagePack. Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Extension always bottoms out on built-in types, there are no opaque binary blobs. Thus Transit format can always be decoded, and can be subject to editing, transformation and search operations, even by applications which do not 'know about' particular extension tags. In this sense, Transit is self-describing.
+Transit is designed to be implemented as an encoding on top of formats for which high performance processors already exist, specifically [JSON](http://www.ietf.org/rfc/rfc4627.txt) and [MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md). Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Extension always bottoms out on built-in types, there are no opaque binary blobs. Thus Transit format can always be decoded, and can be subject to editing, transformation and search operations, even by applications which do not 'know about' particular extension tags. In this sense, Transit is self-describing.
 
 Transit also supports compression via caching of repeated elements, e.g., map keys, that can significantly reduce payload size and decoding time, as well as memory in the resulting application representation.
 
@@ -39,7 +39,7 @@ _NOTE: Transit is a work in progress and may evolve based on feedback. As a resu
 
 ## How it works
 
-Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of supported semantic types. Then it encodes the value into MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string, a two element array or a map/JSON-object. 
+Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of supported semantic types. Then it encodes the value into MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string, a two element array or a JSON object or MessagePack map (referred to as object/map in the rest of this specification). 
 
 When Transit data is read, any encoded values are decoded and programming language appropriate representations are produced.
 
@@ -52,36 +52,36 @@ When necessary, Transit encodes values as a tag indicating their semantic type a
 * as an array ```["~#tag", value]```
 * as an object ```{"~#tag" : value}```
 
-The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. In general, instances of ground types are represented directly in MessagePack or JSON, although there are some exceptions. Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string, array or map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
+The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. In general, instances of ground types are represented directly in MessagePack or JSON, although there are some exceptions. Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string, array or object/map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
 
 **Scalar Types**
 
-|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
+|   | Semantic Type | Tag | Rep Tag | Rep | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
 |ground| null| _ | | nil |"\_" |nil| null when not key, else "~\_" | null when not key, else "~\_" |
 |ground| string| s | | "string" | | String | String | String |
 |ground| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"|
 |ground| integer, signed 64 bit| i| | integer | "123"| smallest int that holds value | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
 |ground|floating pt decimal| d| |  floating pt number | "123.456" | smallest float that holds value | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
-|ground| bytes [(RFC 4648)](http://www.ietf.org/rfc/rfc4648.txt)| b | | base64 encoded bytes | "base64 encoded bytes"|  "~bbase64" | "~bbase64" | "~bbase64" |
+|ground| bytes| b | | base64 encoded bytes [(RFC 4648)](http://www.ietf.org/rfc/rfc4648.txt)| "base64 encoded bytes"|  "~bbase64" | "~bbase64" | "~bbase64" |
 |extension| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key" |
 |extension| symbol | $ |s| "sym"| | "~$sym"| "~$sym"| "~$sym" |
-|extension| big decimal| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
-|extension| big integer|	n|	s|	"123"| |	"~n1234"|	"~n1234"|	"~n1234" |
+|extension| big decimal, arbitrary precision| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
+|extension| big integer, arbitrary precision| n| s| "123"| | "~n1234"| "~n1234"| "~n1234" |
 |extension| time |m| i| int msecs since 1970 | "1234566789" | ["~#m", int]|  "~m123456789" | N/A  |
-|extension| time [(RFC 3339)](http://www.ietf.org/rfc/rfc3339.txt)|t |s| "1985-04-12T23:20:50.52Z"| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
-|extension| uuid [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)| u | s or array|  [int, int]|  "531a379e-31bb-4ce1-8690-158dceb64be6"|  ["~#u", [hi64, lo64]]|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
-|extension| uri [(RFC 3986)](http://www.ietf.org/rfc/rfc3986.txt)| r| s| | "http://..."| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
+|extension| time |t |s| date string [(RFC 3339)](http://www.ietf.org/rfc/rfc3339.txt)| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
+|extension| uuid | u | s or array|  [hi64, lo64] [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)|  UUID string [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)|  ["~#u", [hi64, lo64]]|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
+|extension| uri | r| s| | uri string [(RFC 3986)](http://www.ietf.org/rfc/rfc3986.txt)| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
 |extension| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
 |extension| quoted scalar| ' | | scalar value| NA|	["~#'", scalar] | ["~#'", scalar] | {"~#'" : scalar } |
 |*extension*|*Scalar extension type* | *X*| *specify or s* | *"arep" or arep*|  *"arep"* | *"~Xarep" or ["~#X", arep]*| *"~Xarep" or ["~#X", arep]* | *"~Xarep" or ["~#X", arep]* |
 
 **Composite Types**
 
-|   | Semantic Type | Tag | Rep | Rep Tag | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
+|   | Semantic Type | Tag | Rep Tag | Rep | String rep (if not already) | MessagePack | JSON | JSON-Verbose (no caching) |
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
 |ground| array | array | | iterable | |  Array |  Array |  Array |
-|ground| map |  map |  |  iterable &lt;map entry> |  |  Object  | Array: ["^ ", k1, v1, ...] |  Object |
+|ground| map |  map |  |  iterable &lt;map entry> |  |  Map  | Array: ["^ ", k1, v1, ...] |  Object |
 |extension| set |  set |  array  | [vals...] |  |  ["~#set", [vals ...]] |  ["~#set", [vals ...]] |  {"~#set" : [vals ...]} |
 |extension| list |  list |  array |  [vals...] |  |  ["~#list", [vals ...]] |  ["~#list", [vals ...]] |  {"~#list" : [vals ...]} |
 |extension| map w/ composite keys |  cmap |  array |  [k1, v1, ...] |  |  ["~#cmap", [k1, v1, ...]] |  ["~#cmap", [k1, v1, ...]] |  {"~#cmap" : [k1, v1, ...]} |
@@ -256,13 +256,13 @@ The Transit encoding of a circle at 10, 20 with a radius of 5 looks like this in
 
 ### Quoting
 
-Some JSON processors only allow arrays or objects as top level forms. If you write a single scalar value using Transit, it gets quoted. A quoted scalar is represented as a map on the wire:
+There is a special representation for quoted values. Quote tag is ' (~#') and yields its value intact. It is used to wrap scalar values at top-level, where some JSON parsers will not accept scalars.
 
 ```javascript
-{"~#'" : "a string"}
+["~#'", "a quoted string"]
 ```
 
-Transit handles quoting scalars on write and unquoting them on read as necessary.
+Transit handles quoting top-level scalars on write and unquoting them on read as necessary.
 
 ### TaggedValues
 
