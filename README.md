@@ -39,22 +39,28 @@ _NOTE: Transit is a work in progress and may evolve based on feedback. As a resu
 
 ## How it works
 
-Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of supported semantic types. Then it encodes the value into MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string, a two element array or a JSON object or MessagePack map (referred to as object/map in the rest of this specification). 
+Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of the supported semantic types. Then it encodes the value into MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string, a two element array or a JSON object or MessagePack map (referred to as object/map in the rest of this specification). 
 
 When Transit data is read, any encoded values are decoded and programming language appropriate representations are produced.
 
 Transit defines the rules for encoding and decoding semantically typed values. It does not define how encoded data is stored, transmitted, or otherwise used.
 
-### Tag-based encoding
+### Recursive tag-based encoding
 
 When necessary, Transit encodes values as a tag indicating their semantic type and the value in a form that can be represented directly in MessagePack or JSON, or which can itself be further encoded. Each of the semantic types that Transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in MessagePack or JSON, it is encoded one of three ways:
 * as a string ```"~" + tag-char + value-str```
 * as an array ```["~#tag", value]```
 * as a JSON object ```{"~#tag" : value}```
 
+The diagram below provides an overview of the Transit encoding and decoding processes (the _Write Flow_ and _Read Flow_ diagrams below show the logic in detail).
+
 ![Transit Overview](img/transit-overview.png)
 
-The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. In general, instances of ground types are represented directly in MessagePack or JSON, although there are some exceptions. Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string, array or object/map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
+Both the writing and reading processes differentiate between _ground types_ and _extension types_. In general, instances of ground types are represented directly in MessagePack or JSON (although there are some exceptions). Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string, array or object/map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. _Write handlers_ are used to recursively map instance of programming language types to Transit ground or extension types, which themselves map to ground types, while writing. _Read handlers_ are used to recursively map Transit values to instances of programming language types.
+
+### Ground and extension types
+
+The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
 
 **Scalar Types**
 
