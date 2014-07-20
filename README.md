@@ -70,18 +70,18 @@ The two tables below lists all of the built-in semantic types and their correspo
 |ground| string| s | | "string" | | String | String | String |
 |ground| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"|
 |ground| integer, signed 64 bit| i| | integer | "123"| smallest int that holds value | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
-|ground|floating pt decimal| d| |  floating pt number | "123.456" | smallest float that holds value | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
+|ground|floating pt decimal| d| |  floating pt number | "123.456" | smallest float that matches precision | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
 |ground| bytes| b | | base64 encoded bytes [(RFC 4648)](http://www.ietf.org/rfc/rfc4648.txt)| "base64 encoded bytes"|  "~bbase64" | "~bbase64" | "~bbase64" |
 |extension| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key" |
 |extension| symbol | $ |s| "sym"| | "~$sym"| "~$sym"| "~$sym" |
-|extension| big decimal, arbitrary precision| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
-|extension| big integer, arbitrary precision| n| s| "123"| | "~n1234"| "~n1234"| "~n1234" |
-|extension| time |m| i| int msecs since 1970 | "1234566789" | ["~#m", int]|  "~m123456789" | N/A  |
-|extension| time |t |s| date string [(RFC 3339)](http://www.ietf.org/rfc/rfc3339.txt)| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
+|extension| arbitrary precision decimal| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
+|extension| arbitrary precision integer| n| s| "123"| | "~n1234"| "~n1234"| "~n1234" |
+|extension| point in time |m| i| int msecs since 1970 | "1234566789" | ["~#m", int]|  "~m123456789" | N/A  |
+|extension| point in time |t |s| date string [(RFC 3339)](http://www.ietf.org/rfc/rfc3339.txt)| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
 |extension| uuid | u | s or array|  [hi64, lo64] [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)|  UUID string [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)|  ["~#u", [hi64, lo64]]|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
 |extension| uri | r| s| | uri string [(RFC 3986)](http://www.ietf.org/rfc/rfc3986.txt)| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
 |extension| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
-|extension| quoted scalar| ' | | scalar value| NA|	["~#'", scalar] | ["~#'", scalar] | {"~#'" : scalar } |
+|extension| quoted value| ' | | value| NA|	["~#'", scalar] | ["~#'", value] | {"~#'" : value } |
 |*extension*|*Scalar extension type* | *X*| *specify or s* | *"arep" or arep*|  *"arep"* | *"~Xarep" or ["~#X", arep]*| *"~Xarep" or ["~#X", arep]* | *"~Xarep" or ["~#X", arep]* |
 
 **Composite Types**
@@ -93,7 +93,7 @@ The two tables below lists all of the built-in semantic types and their correspo
 |extension| set |  set |  array  | [vals...] |  |  ["~#set", [vals ...]] |  ["~#set", [vals ...]] |  {"~#set" : [vals ...]} |
 |extension| list |  list |  array |  [vals...] |  |  ["~#list", [vals ...]] |  ["~#list", [vals ...]] |  {"~#list" : [vals ...]} |
 |extension| map w/ composite keys |  cmap |  array |  [k1, v1, ...] |  |  ["~#cmap", [k1, v1, ...]] |  ["~#cmap", [k1, v1, ...]] |  {"~#cmap" : [k1, v1, ...]} |
-|extension| link | 	link | 	map | map with string keys: href, rel, name, render, prompt; name, render, prompt are optional; value of href is a URI, value of all other keys is a string, value of render key must be "image" or "link", as per http://amundsen.com/media-types/collection/format/#arrays-links | | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | {"~#link" : {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}} |
+|extension| link | 	link | 	map | map with string keys: "href", "rel", "name", "render", "prompt"; name, render, prompt are optional; value of href is a URI, value of all other keys is a string, value of render key must be "image" or "link", as per [Collection+JSON](http://amundsen.com/media-types/collection/format/#arrays-links) | | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | {"~#link" : {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}} |
 |*extension*|*Composite extension type* | *tag* | *specify* | *rep* |  | *{"~#tag" : rep}* | *{"~#tag" : rep}* |  *{"~#tag" : rep}* |
 
 Note that there are two modes for writing data in JSON. In normal JSON mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also JSON-Verbose mode, which is less efficient, but easier for a person to read. In JSON-Verbose mode, caching is disabled and maps are represented as JSON objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
