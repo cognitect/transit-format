@@ -82,7 +82,7 @@ The two tables below lists all of the built-in semantic types and their correspo
 |extension| uri | r| s| | uri string [(RFC 3986)](http://www.ietf.org/rfc/rfc3986.txt)| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
 |extension| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
 |extension| quoted value| ' | | value| NA|	["~#'", scalar] | ["~#'", value] | {"~#'" : value } |
-|*extension*|*Scalar extension type* | *X*| *specify or s* | *"arep" or arep*|  *"arep"* | *"~Xarep" or ["~#X", arep]*| *"~Xarep" or ["~#X", arep]* | *"~Xarep" or ["~#X", arep]* |
+|*extension*|*Scalar extension type* | *X*| *specify or s* | *"arep" or arep*|  *"arep"* | *"~Xarep" or ["~#X", arep]*| *"~Xarep" or ["~#X", arep]* | *"~Xarep" or {"~#X": arep}* |
 
 **Composite Types**
 
@@ -94,7 +94,7 @@ The two tables below lists all of the built-in semantic types and their correspo
 |extension| list |  list |  array |  [vals...] |  |  ["~#list", [vals ...]] |  ["~#list", [vals ...]] |  {"~#list" : [vals ...]} |
 |extension| map w/ composite keys |  cmap |  array |  [k1, v1, ...] |  |  ["~#cmap", [k1, v1, ...]] |  ["~#cmap", [k1, v1, ...]] |  {"~#cmap" : [k1, v1, ...]} |
 |extension| link | 	link | 	map | map with string keys: "href", "rel", "name", "render", "prompt"; name, render, prompt are optional; value of href is a URI, value of all other keys is a string, value of render key must be "image" or "link", as per [Collection+JSON](http://amundsen.com/media-types/collection/format/#arrays-links) | | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | {"~#link" : {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}} |
-|*extension*|*Composite extension type* | *tag* | *specify* | *rep* |  | *{"~#tag" : rep}* | *{"~#tag" : rep}* |  *{"~#tag" : rep}* |
+|*extension*|*Composite extension type* | *tag* | *specify* | *rep* |  | *["~#tag", rep]* | *["~#tag", rep]* |  *{"~#tag" : rep}* |
 
 Note that there are two modes for writing data in JSON. In normal JSON mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also JSON-Verbose mode, which is less efficient, but easier for a person to read. In JSON-Verbose mode, caching is disabled and maps are represented as JSON objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
 
