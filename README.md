@@ -81,7 +81,7 @@ The two tables below lists all of the built-in semantic types and their correspo
 |extension| uuid | u | s or array|  [hi64, lo64] [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)|  UUID string [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)|  ["~#u", [hi64, lo64]]|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
 |extension| uri | r| s| | uri string [(RFC 3986)](http://www.ietf.org/rfc/rfc3986.txt)| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
 |extension| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
-|extension| quoted value| ' | | value| NA|	["~#'", scalar] | ["~#'", value] | {"~#'" : value } |
+|extension| quoted value| ' | | value| NA|	["~#'", value] | ["~#'", value] | {"~#'" : value } |
 |*extension*|*Scalar extension type* | *X*| *specify or s* | *"arep" or arep*|  *"arep"* | *"~Xarep" or ["~#X", arep]*| *"~Xarep" or ["~#X", arep]* | *"~Xarep" or {"~#X": arep}* |
 
 **Composite Types**
