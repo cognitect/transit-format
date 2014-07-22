@@ -6,9 +6,9 @@ Transit is a format and set of libraries for conveying values between applicatio
 
 # Rationale
 
-Transit provides a set of basic of elements and a set of extension elements for representing typed values. The extension mechanism is open, allowing programs using Transit to add new elements specific to their needs. Users of data formats without such facilities must rely on either schemas, convention or context to convey elements not included in the base set, making application code much more complex. With Transit, schemas, convention and context-sensitive logic are not required. 
+Transit provides a set of basic of elements and a set of extension elements for representing typed values. The extension mechanism is open, allowing programs using Transit to add new elements specific to their needs. Users of data formats without such facilities must rely on either schemas, convention, or context to convey elements not included in the base set, making application code much more complex. With Transit, schemas, convention, and context-sensitive logic are not required. 
 
-Transit is designed to be implemented as an encoding on top of formats for which high performance processors already exist, specifically [JSON](http://www.ietf.org/rfc/rfc7159.txt) and [MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md). Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Extension always bottoms out on built-in types, there are no opaque binary blobs. Thus Transit format can always be decoded, and can be subject to editing, transformation and search operations, even by applications which do not 'know about' particular extension tags. In this sense, Transit is self-describing.
+Transit is designed to be implemented as an encoding on top of formats for which high performance processors already exist, specifically [JSON](http://www.ietf.org/rfc/rfc7159.txt) and [MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md). Transit uses these formats' native representations for built-in elements, e.g., strings and arrays, wherever possible. Extension elements which have no native representation in these formats, e.g., dates, are represented using a tag-based encoding scheme. Extension always bottoms out on built-in types; there are no opaque binary blobs. Thus Transit format can always be decoded, and can be subject to editing, transformation, and search operations, even by applications which do not "know about" particular extension tags. In this sense, Transit is self-describing.
 
 Transit also supports compression via caching of repeated elements, e.g., map keys, that can significantly reduce payload size and decoding time, as well as memory in the resulting application representation.
 
@@ -16,7 +16,7 @@ The design of Transit is focused on program-to-program communication, as opposed
 
 Transit processes elements in terms of semantic types, but it is not a type system, and has no schemas. Nor is it a system for representing object graphs - there are no reference types nor identity, nor should a consumer have an expectation that two equivalent elements in some body of Transit will yield distinct object identities when read, unless a reader implementation goes out of its way to make such a promise. Thus the resulting values should be considered immutable, and a reader implementation should yield values that ensure this, to the extent possible. 
 
-Transit defines the encoding of elements. There is no enclosing element required at the top level. Thus Transit is suitable for streaming and interactive applications. A use of transit might be a stream or file containing a series of elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param.
+Transit defines the encoding of elements. There is no enclosing element required at the top level. Thus, Transit is suitable for streaming and interactive applications. A use of Transit might be a stream or file containing a series of elements, but it could be as small as the conveyance of a single element in e.g. an HTTP query param.
 
 The base set of built-in and extension elements in Transit is meant to cover the basic set of data structures common to most programming languages. While Transit specifies how those elements are encoded, it does not dictate the application memory/object representation on either the producer or consumer side. A well behaved implementation library should endeavor to map the elements to common programming language types with similar semantics. 
 
@@ -41,13 +41,14 @@ _NOTE: Transit is a work in progress and may evolve based on feedback. As a resu
 
 Transit is defined in terms of an extensible set of elements used to represent values. The elements correspond to semantic types common across programming languages, e.g., strings, arrays, URIs, etc. When an object is written with Transit, a language-specific Transit library maps the object's type to one of the supported semantic types. Then it encodes the value into MessagePack or JSON using the rules defined for that semantic type. Whenever possible, data is written directly to MessagePack or JSON using those protocols' built-in types. For instance, a string or an array from any language is always just represented as a string or an array in MessagePack or JSON. When a value cannot be represented directly as a built-in type in MessagePack or JSON, it must be encoded. Encoding captures the semantic type and value of the data in a form that can be represented as a built-in type in MessagePack or JSON, either a string, a two element array or a JSON object or MessagePack map (referred to as object/map in the rest of this specification). 
 
-When Transit data is read, any encoded values are decoded and programming language appropriate representations are produced.
+When Transit data is read, any encoded values are decoded and programming-language appropriate representations are produced.
 
 Transit defines the rules for encoding and decoding semantically typed values. It does not define how encoded data is stored, transmitted, or otherwise used.
 
 ### Recursive tag-based encoding
 
-When necessary, Transit encodes values as a tag indicating their semantic type and the value in a form that can be represented directly in MessagePack or JSON, or which can itself be further encoded. Each of the semantic types that Transit supports has a unique tag. Scalar values have single-character tags and composite values have multi-character tags. When a value cannot be directly represented in MessagePack or JSON, it is encoded one of three ways:
+When necessary, Transit encodes values using a tag (indicating the semantic type) and an untyped representation of the value. This value may be represented directly (in MessagePack or JSON) or further encoded. Each of the semantic types that Transit supports has a unique tag. Scalar values have single-character tags; composite values have multi-character tags. When a value cannot be directly represented in MessagePack or JSON, it is encoded in one of three ways:
+
 * as a string ```"~" + tag-char + value-str```
 * as an array ```["~#tag", value]```
 * as a JSON object ```{"~#tag" : value}```
@@ -56,11 +57,11 @@ The diagram below provides an overview of the Transit encoding and decoding proc
 
 ![Transit Overview](img/transit-overview.png)
 
-Both the writing and reading processes differentiate between _ground types_ and _extension types_. In general, instances of ground types are represented directly in MessagePack or JSON (although there are some exceptions). Instances of extended types are never represented directly in MessagePack or JSON, they are always encoded. Whether they are encoded in string, array or object/map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. _Write handlers_ are used to recursively map instance of programming language types to Transit ground or extension types, which themselves map to ground types, while writing. _Read handlers_ are used to recursively map Transit values to instances of programming language types.
+Both the writing and reading processes differentiate between _ground types_ and _extension types_. In general, instances of ground types are represented directly in MessagePack or JSON (although there are some exceptions). Instances of extended types are never represented directly in MessagePack or JSON; they are always encoded. Whether they are encoded in string, array, or object/map form depends on whether the data is a scalar or a composite as well as whether it is being written to MessagePack or JSON. _Write handlers_ are used to recursively map instances of programming language types to Transit ground or extension types, which themselves map to ground types, while writing. _Read handlers_ are used to recursively map Transit values to instances of programming language types.
 
 ### Ground and extension types
 
-The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. For each extended type, the rep tag, rep and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
+The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. For each extended type, the rep tag, rep, and string rep columns show the corresponding encoded form. The MessagePack, JSON, and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
 
 **Scalar Types**
 
@@ -110,7 +111,7 @@ Transit relies on a small number of character sequences to encode specific infor
 |"^ "|map-as-array marker|when it is first item in array, indicates array represents a map
 |`|reserved|save backquote for expansion, escaped for now
 
-Because the ~, ^ and ` characters have special meaning, any data string that begins with one of those characters is escaped by prepending a ~.
+Because the ~, ^, and ` characters have special meaning, any data string that begins with one of those characters is escaped by prepending a ~.
 
 ### Caching
 
@@ -274,7 +275,7 @@ Transit handles quoting top-level scalars on write and unquoting them on read as
 
 ### TaggedValues
 
-It is possible that Transit encoded data will contain a semantic type that a processing application does not have a decoder for. In that case, the encoded value cannot be decoded and is returned as an instance of a special TaggedValue type with two properties, a tag and a value (details vary by programming language). TaggedValues can be inspected by application code if required. If a TaggedValue instance is written with Transit, the tag and value are used for the encoded form. ensuring that TaggedValues roundtrip correctly.
+It is possible that Transit encoded data will contain a semantic type that a processing application does not have a decoder for. In that case, the encoded value cannot be decoded and is returned as an instance of a special TaggedValue type with two properties, a tag and a value (details vary by programming language). TaggedValues can be inspected by application code if required. If a TaggedValue instance is written with Transit, the tag and value are used for the encoded form, ensuring that TaggedValues roundtrip correctly.
 
 ### Write Flow
 
