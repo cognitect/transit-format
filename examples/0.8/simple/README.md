@@ -169,7 +169,7 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: uris.edn uris.json uris.verbose.json uris.mp
 * Value (EDN)
 
-     [#<URI http://example.com> #<URI ftp://example.com> #<URI file:///path/to/file.txt> #<URI http://www.詹姆斯.com/>]
+     [#<URI http://example.com> #<URI ftp://example.com> #<URI file:///path/to/file.txt>]
 
 ## A vector of interesting dates: 1776-07-04, 1970-01-01, 2000-01-01, 2014-04-07
 * Files: dates_interesting.edn dates_interesting.json dates_interesting.verbose.json dates_interesting.mp
