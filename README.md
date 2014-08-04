@@ -98,7 +98,7 @@ The two tables below lists all of the built-in semantic types and their correspo
 
 Note that there are two modes for writing data in JSON. In normal JSON mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also JSON-Verbose mode, which is less efficient, but easier for a person to read. In JSON-Verbose mode, caching is disabled and maps are represented as JSON objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
 
-
+Also note that while each write mode (JSON, JSON-Verbose and MessagePack) writes a subset as specified, a reader *must* accept any transit-supported construct at any time.
 
 ### Special Characters
 
