@@ -14,7 +14,7 @@ Transit is designed to be implemented as an encoding on top of formats for which
 
 Transit also supports compression via caching of repeated elements, e.g., map keys, that can significantly reduce payload size and decoding time, as well as memory in the resulting application representation.
 
-The design of Transit is focused on program-to-program communication, as opposed to human readability. While it does support an explicit verbose mode for representing Transit elements in JSON, Transit is not targeted for situations where human readability is paramount. 
+The design of Transit is focused on program-to-program communication, as opposed to human readability. While it does support an explicit verbose mode for representing Transit elements in JSON (called JSON-Verbose), Transit is not targeted for situations where human readability is paramount. 
 
 Transit processes elements in terms of semantic types, but it is not a type system, and has no schemas. Nor is it a system for representing object graphs - there are no reference types nor identity, nor should a consumer have an expectation that two equivalent elements in some body of Transit will yield distinct object identities when read, unless a reader implementation goes out of its way to make such a promise. Thus the resulting values should be considered immutable, and a reader implementation should yield values that ensure this, to the extent possible. 
 
@@ -63,7 +63,7 @@ Both the writing and reading processes differentiate between _ground types_ and 
 
 ### Ground and extension types
 
-The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. For each extended type, the rep tag, rep, and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format.
+The two tables below lists all of the built-in semantic types and their corresponding tags. The first table lists scalar types, the second table lists composite types. The first column indicates whether the type is a *ground type* or an *extension type*. For each extended type, the rep tag, rep, and string rep columns show the corresponding encoded form. The MessagePack, JSON and JSON-Verbose columns show how a tag and encoded form are combined in the target format and write mode.
 
 **Scalar Types**
 
@@ -99,7 +99,8 @@ The two tables below lists all of the built-in semantic types and their correspo
 |extension| link | 	link | 	map | map with string keys: "href", "rel", "name", "render", "prompt"; name, render, prompt are optional; value of href is a URI, value of all other keys is a string, value of render key must be "image" or "link", as per [Collection+JSON](http://amundsen.com/media-types/collection/format/#arrays-links) | | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | ["~#link" , {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}] | {"~#link" : {"href": "~rhttp://...", "rel": "a-rel", "name": "a-name", "render": "link or image", "prompt": "a-prompt"}} |
 |*extension*|*Composite extension type* | *tag* | *specify* | *rep* |  | *["~#tag", rep]* | *["~#tag", rep]* |  *{"~#tag" : rep}* |
 
-Note that there are two modes for writing data in JSON. In normal JSON mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also JSON-Verbose mode, which is less efficient, but easier for a person to read. In JSON-Verbose mode, caching is disabled and maps are represented as JSON objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. 
+
+Note that there are two write modes for JSON. In normal JSON mode, caching is enabled (explained below) and maps are represented as arrays with a special marker element. There is also JSON-Verbose mode, which is less efficient, but easier for a person to read. In JSON-Verbose mode, caching is disabled and maps are represented as JSON objects. This is useful for configuration files, debugging, or any other situation where readability is more important than performance. A JSON reader is expected to transparently handle data written in either mode and to remain unaware of which mode was used to write the data.
 
 ### Special Characters
 
