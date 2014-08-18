@@ -4,6 +4,9 @@ Transit is a format and set of libraries for conveying values between applicatio
 
 *Version:* 0.8
 
+For discussion of Transit, please visit the Transit mailing list
+(https://groups.google.com/forum/#!forum/transit-format).
+
 # Rationale
 
 Transit provides a set of basic elements and a set of extension elements for representing typed values. The extension mechanism is open, allowing programs using Transit to add new elements specific to their needs. Users of data formats without such facilities must rely on either schemas, convention or context to convey elements not included in the base set, making application code much more complex. With Transit, schemas, convention and context-sensitive logic are not required. 
