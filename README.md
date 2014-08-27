@@ -187,7 +187,7 @@ Because the writer and the reader encounter cacheable values in the same order, 
 
 ### Extensibility
 
-Applications can extend Transit as necessary. There are two steps to extending Transit: defining a new semantic type and adding handlers and decoders to map from / to programming language types.
+Applications can extend Transit as necessary. There are two steps to extending Transit: defining a new semantic type and adding write and read handlers to map from / to programming language types.
 
 To define a new semantic type, specify its meaning, tag and representation. You can also define a string representation and a verbose representation, but they are not required. For instance, you could define a new semantic type representing a point in the Cartesian coordinate system, with the tag "point" and represented as an array of two integers x and y:
 
@@ -195,7 +195,7 @@ To define a new semantic type, specify its meaning, tag and representation. You 
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
 | extension | point|point| array|[int, int] | |["~#point", [int, int] ]|["~#point", [int, int] ]| {"~#point" : [int, int] }
 
-Once the semantic type is defined, you can create handlers and decoders.
+Once the semantic type is defined, you can create write and read handlers.
 
 A *write handler* maps values of a programming language type to values of a Transit semantic type. A write handler is a logical interface with the following operations (details differ by programming language):
 
@@ -214,12 +214,12 @@ A *read handler* maps values of a Transit semantic type to values of a programmi
 
 Maps are used to associate Transit tags with read handlers.
 
-Here is an example of a handler and a decoder for the point semantic type that map from/to a Point record type in Clojure:
+Here is an example of write and read handlers for the point semantic type that map from/to a Point record type in Clojure:
 
 ```clojure
 (defrecord Point [x y])
- 
-;; handler
+
+;; write handler
 {Point
    (reify Handler
      (tag [_ _] "point")
@@ -227,11 +227,11 @@ Here is an example of a handler and a decoder for the point semantic type that m
      (stringRep [_ kw] nil)
      (verboseHandler [_] nil))
 
-;; decoder
+;; read handler
 {"point"
   (fn [rep] (let [[x y] rep] (Point. x y)))}
 ```
- 
+
 #### Recursive Extensions
 
 You can define extension types in terms of other extension types. Transit manages the details of recursively encoding and decoding representations.
@@ -242,12 +242,12 @@ For example, imagine a circle semantic type with the tag "circle" represented as
 |:--|:--------------|:----|:----|:--------|:----------------------------|:--------|:-----|:--------------------------|
 |extension	|circle| circle| array	|[point, int] | | ["~#circle", [point, int]] | ["~#circle", [point, int] ] | {"~#circle" : [point, int] }
 
-Here is an example of a handler and a decoder for the circle semantic type that map from/to a Circle record type in Clojure:
+Here is an example of write and read handlers for the circle semantic type that map from/to a Circle record type in Clojure:
 
 ```clojure
 (defrecord Circle [origin radius])
- 
-;; handler
+
+;; write handler
 {Circle
    (reify Handler
      (tag [_ _] "circle")
@@ -255,7 +255,7 @@ Here is an example of a handler and a decoder for the circle semantic type that 
      (stringRep [_ kw] nil)
      (verboseHandler [_] nil))
 
-;; decoder
+;; read handler
 {"circle"
   (fn [rep] (let [[origin radius] rep] (Circle. origin radius)))}
 ```
@@ -278,7 +278,7 @@ Transit handles quoting top-level scalars on write and unquoting them on read as
 
 ### TaggedValues
 
-It is possible that Transit encoded data will contain a semantic type that a processing application does not have a decoder for. In that case, the encoded value cannot be decoded and is returned as an instance of a special TaggedValue type with two properties, a tag and a value (details vary by programming language). TaggedValues can be inspected by application code if required. If a TaggedValue instance is written with Transit, the tag and value are used for the encoded form. ensuring that TaggedValues roundtrip correctly.
+It is possible that Transit encoded data will contain a semantic type that a processing application does not have a read handler for. In that case, the encoded value cannot be decoded and is returned as an instance of a special TaggedValue type with two properties, a tag and a value (details vary by programming language). TaggedValues can be inspected by application code if required. If a TaggedValue instance is written with Transit, the tag and value are used for the encoded form. ensuring that TaggedValues roundtrip correctly.
 
 ### Write Flow
 
