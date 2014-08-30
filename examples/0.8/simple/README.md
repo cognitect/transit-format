@@ -375,3 +375,9 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 
      ["~Unrecognized"]
 
+## Vector with special numbers
+* Files: vector_special_numbers.edn vector_special_numbers.json vector_special_numbers.verbose.json vector_special_numbers.mp
+* Value (EDN)
+
+     [NaN Infinity -Infinity]
+
