@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cd `dirname $0`/../..
+
+if [ ! -d "transit-js" ]; then
+  git clone git@github.com:cognitect/transit-js.git
+  cd transit-js
+  npm install
+else
+  echo "transit-js exists"
+fi

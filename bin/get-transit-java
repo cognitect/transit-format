@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cd `dirname $0`/../..
+
+if [ ! -d "transit-java" ]; then
+  git clone git@github.com:cognitect/transit-java.git
+  cd transit-java
+  build/package
+else
+  echo "transit-java exists"
+fi
+
+if [ ! -d "transit-java/target/classes" ]; then
+  cd transit-java
+  build/package
+else
+  echo "transit-java classes exist"
+fi

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo "Generating exemplar files into examples/0.8/simple"
+
+rm -rf examples/0.8/simple
+mkdir examples/0.8/simple
+
+java -server -Xms1g -Xmx1g -cp `pwd`/test:`bin/classpath` clojure.main -i test/exemplar.clj -m transit.exemplar examples/0.8/simple

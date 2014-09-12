@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cd `dirname $0`/../..
+
+if [ ! -d "transit-clj" ]; then
+  git clone git@github.com:cognitect/transit-clj.git
+  cd transit-clj
+  build/package
+else
+  echo "transit-clj exists"
+fi
+
+if [ ! -d "transit-clj/target/classes" ]; then
+  cd transit-clj
+  build/package
+else
+  echo "transit-clj classes exist"
+fi

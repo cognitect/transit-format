@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cd `dirname $0`/../..
+
+if [ ! -d "transit-cljs" ]; then
+  git clone git@github.com:cognitect/transit-cljs.git
+  cd transit-cljs
+  lein cljsbuild once roundtrip
+else
+  echo "transit-cljs exists"
+fi

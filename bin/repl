@@ -1,0 +1,3 @@
+#!/bin/sh
+
+java -server -Xms1g -Xmx1g -cp `bin/classpath` clojure.main -r

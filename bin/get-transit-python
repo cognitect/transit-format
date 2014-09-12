@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cd `dirname $0`/../..
+
+if [ ! -d "transit-python" ]; then
+  git clone git@github.com:cognitect/transit-python.git
+  cd transit-python
+  pip install -e .
+else
+  echo "transit-python exists"
+fi
+

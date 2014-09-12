@@ -1,0 +1,8 @@
+#!/bin/bash
+
+classpath_file=/tmp/classpath-$RANDOM
+
+mvn -q dependency:build-classpath -Dmdep.outputFile=$classpath_file
+
+cat $classpath_file <(echo ":`pwd`/src:`pwd`/test")
+rm $classpath_file
