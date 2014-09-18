@@ -54,7 +54,7 @@ Testing `transit-java` requires Maven.
 
 Testing `transit-ruby` requires Ruby >= 1.9 and Bundler `gem install bundler`.
 
-Testing `transit-jruby` requires JRuby >= 1.7.13 and Bundler `gem install bundler`.
+Testing `transit-jruby` requires JRuby >= 1.7.15 and Bundler `gem install bundler`.
 
 
 ### Supporting testing

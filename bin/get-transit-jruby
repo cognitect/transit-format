@@ -7,13 +7,13 @@ command -v rbenv >/dev/null 2>&1 || { echo >&2 "transit-ruby and transit-jruby r
 if [ ! -d "transit-jruby" ]; then
   git clone git@github.com:cognitect/transit-ruby.git transit-jruby
   cd transit-jruby
-  rbenv local jruby-1.7.13
+  rbenv local jruby-1.7.15
   export JAVA_OPTS="-Xmx1g"
   ruby -S gem install bundler
   bundle install
   bundle exec rake compile
 else
   cd transit-jruby
-  rbenv local jruby-1.7.13
+  rbenv local jruby-1.7.15
   echo "transit-jruby exists"
 fi
