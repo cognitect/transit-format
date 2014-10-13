@@ -113,7 +113,7 @@ Transit relies on a small number of character sequences to encode specific infor
 |~#|tag|followed by tag name, one or more chars
 |^|cache|followed by one or two chars (see Caching below)
 |"^ "|map-as-array marker|when it is first item in array, indicates array represents a map
-|`|reserved|save backquote for expansion, escaped for now
+|\`|reserved|save backquote for expansion, escaped for now
 
 Because the ~, ^, and ` characters have special meaning, any data string that begins with one of those characters is escaped by prepending a ~.
 
