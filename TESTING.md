@@ -1,4 +1,4 @@
-## Testing Tansit implementations
+## Testing Transit implementations
 
 This project contains code which may be used to test all
 implementations of transit.
