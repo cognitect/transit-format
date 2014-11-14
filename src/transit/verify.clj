@@ -50,7 +50,7 @@
 
 (def TIMEOUT
   "Timeout for roundtrip requests to native implementation"
-  10000)
+  20000)
 
 (defn read-bytes
   "Read the contents of the passed file into a byte array and return
