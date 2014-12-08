@@ -24,7 +24,7 @@ The base set of built-in and extension elements in Transit is meant to cover the
 
 # Implementations
 
-There are currently implementations for the following languages:
+There are currently verified implementations for the following languages:
 
 * [Clojure](http://github.com/cognitect/transit-clj)
 * [ClojureScript](http://github.com/cognitect/transit-cljs)
@@ -36,6 +36,8 @@ There are currently implementations for the following languages:
 Each library's major.minor version number corresponds to the version of this specification it implements.
 
 _NOTE: Transit is a work in progress and may evolve based on feedback. As a result, while Transit is a great option for transferring data between applications, it should not yet be used for storing data durably over time. This recommendation will change when the specification is complete._
+
+For additional languages, see the list of [community-provided implementations](https://github.com/cognitect/transit-format/wiki/Community-Implementations).
 
 # Specification
 
