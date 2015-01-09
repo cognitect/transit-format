@@ -257,7 +257,7 @@
 
 (defn filter-tests
   "Given a process, an encoding and options provided by the user,
-  return a sequcnes of tests to run. Each test is represented as a map
+  return a sequence of tests to run. Each test is represented as a map
   with `:path` and `:test` keys. The value at `:path` is the path into
   the results where the test results are to be stored. The value at
   `:test` is a no argument function which will run a single test."
