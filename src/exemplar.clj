@@ -2,13 +2,13 @@
 ;; All rights reserved.
 
 (ns transit.exemplar
+  "Generate a set of increasingly complex values and use transit to
+marshal them to files for edn, json, json-verbose, and msgpack."
   (:require [cognitect.transit :as t]
             [clojure.java.io :as io])
   (:import [java.net URI]
            [java.io File FileOutputStream ByteArrayInputStream
                     ByteArrayOutputStream OutputStreamWriter]))
-
-;; Generate a set of increasingly complex transit files.
 
 (defn range-centered-on
   ([n] (range-centered-on n 5))
@@ -18,7 +18,7 @@
 
 (defn vector-of-keywords
   [n m]
-  "Return a m length vector consisting of cycles of n keywordss"
+  "Return a m length vector consisting of cycles of n keywords"
   (mapv #(keyword (format "key%04d" %)) (take m (cycle (range n)))))
 
 (defn map-of-size [n]
