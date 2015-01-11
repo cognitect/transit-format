@@ -16,13 +16,10 @@
           #(try (long %) (catch Exception e %))
           (range (- n m) (+ n m 1)))))
 
-(defn vmap [f s]
-  (vec (map f s)))
-
 (defn vector-of-keywords
   [n m]
   "Return a m length vector consisting of cycles of n keywordss"
-  (vmap #(keyword (format "key%04d" %)) (take m (cycle (range n)))))
+  (mapv #(keyword (format "key%04d" %)) (take m (cycle (range n)))))
 
 (defn map-of-size [n]
   (let [nums (range 0 n)]
@@ -122,11 +119,11 @@
 
     (write-exemplar dir "small_strings" "A vector of small strings" small-strings)
 
-    (write-exemplar dir "strings_tilde" "A vector of strings starting with ~" (vmap #(str "~" %) small-strings))
+    (write-exemplar dir "strings_tilde" "A vector of strings starting with ~" (mapv #(str "~" %) small-strings))
 
-    (write-exemplar dir "strings_hash" "A vector of strings starting with #" (vmap #(str "#" %) small-strings))
+    (write-exemplar dir "strings_hash" "A vector of strings starting with #" (mapv #(str "#" %) small-strings))
 
-    (write-exemplar dir "strings_hat" "A vector of strings starting with ^" (vmap #(str "^" %) small-strings))
+    (write-exemplar dir "strings_hat" "A vector of strings starting with ^" (mapv #(str "^" %) small-strings))
 
     (write-exemplar dir "small_ints" "A vector of eleven small integers" (range-centered-on 0))
 
@@ -142,13 +139,13 @@
       dir
       "ints_interesting_neg"
       "A vector of possibly interesting negative integers"
-      (vmap #(* -1 %) interesting-ints))
+      (mapv #(* -1 %) interesting-ints))
 
     (write-exemplar
       dir
       "doubles_small"
       "A vector of eleven doubles from -5.0 to 5.0"
-      (vmap #(double %) (range-centered-on 0)))
+      (mapv #(double %) (range-centered-on 0)))
 
     (write-exemplar
       dir
@@ -169,7 +166,7 @@
 
     (write-exemplar dir "uris" "A vector of URIs" uris)
 
-    (def dates (vmap #(java.util.Date. %) [-6106017600000 0 946728000000 1396909037000]))
+    (def dates (mapv #(java.util.Date. %) [-6106017600000 0 946728000000 1396909037000]))
 
     (write-exemplar
       dir
@@ -178,7 +175,7 @@
       dates)
 
     (write-exemplar dir "symbols" "A vector of symbols" symbols)
-    (write-exemplar dir "keywords" "A vector of keywords" (vmap keyword symbols))
+    (write-exemplar dir "keywords" "A vector of keywords" (mapv keyword symbols))
 
     (write-exemplar dir "list_simple" "A simple list" (apply list vector-simple))
     (write-exemplar dir "list_empty" "An empty list" '())
