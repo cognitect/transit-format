@@ -12,7 +12,9 @@
 
 (defn range-centered-on
   ([n] (range-centered-on n 5))
-  ([n m] (vec (range (- n m) (+ n m 1)))))
+  ([n m] (mapv
+          #(try (long %) (catch Exception e %))
+          (range (- n m) (+ n m 1)))))
 
 (defn vmap [f s]
   (vec (map f s)))
