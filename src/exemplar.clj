@@ -139,7 +139,9 @@ marshal them to files for edn, json, json-verbose, and msgpack."
       dir
       "ints_interesting_neg"
       "A vector of possibly interesting negative integers"
-      (mapv #(* -1 %) interesting-ints))
+      (->> interesting-ints
+           (map #(* -1 %))
+           (mapv #(if (>= % Long/MIN_VALUE) (long %) %))))
 
     (write-exemplar
       dir
