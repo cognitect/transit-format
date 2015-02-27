@@ -22,32 +22,4 @@ do
     shift
 done
 
-if [ -z "$ARGS" ] || [[ $ARGS == *java* ]]; then
-  bin/get-transit-java
-fi
-
-if [ -z "$ARGS" ] || [[ $ARGS == *clj* ]]; then
-  bin/get-transit-clj
-fi
-
-if [ -z "$ARGS" ] || [[ $ARGS == *ruby* ]]; then
-  bin/get-transit-ruby
-fi
-
-if [ -z "$ARGS" ] || [[ $ARGS == *jruby* ]]; then
-  bin/get-transit-jruby
-fi
-
-if [ -z "$ARGS" ] || [[ $ARGS == *js* ]]; then
-  bin/get-transit-js
-fi
-
-if [ -z "$ARGS" ] || [[ $ARGS == *cljs* ]]; then
-  bin/get-transit-cljs
-fi
-
-if [ -z "$ARGS" ] || [[ $ARGS == *python* ]]; then
-  bin/get-transit-python
-fi
-
 exec java -server $XMS $XMX -cp `bin/classpath`:`pwd`/test clojure.main -m transit.verify $ARGS

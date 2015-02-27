@@ -29,7 +29,8 @@
             [cognitect.transit :as t]
             [transit.generators :as gen]
             [transit.corner-cases :as cc]
-            [clojure.pprint :as pp])
+            [clojure.pprint :as pp]
+            [clojure.java.shell :as shell])
   (:import [java.io ByteArrayOutputStream ByteArrayInputStream
             BufferedInputStream BufferedOutputStream FileInputStream]
            [org.apache.commons.codec.binary Hex]
@@ -40,6 +41,7 @@
 (def styles {:reset "[0m"
              :red "[31m"
              :green "[32m"
+             :yellow "[33m"
              :bright "[1m"})
 
 (defn with-style [style & strs]
@@ -347,22 +349,28 @@
   (doseq [e (if enc [enc] [:json :json-verbose :msgpack])]
     (run-test project e opts)))
 
+(def supported-impls #{"transit-clj"
+                       "transit-cljs"
+                       "transit-java"
+                       "transit-jruby"
+                       "transit-js"
+                       "transit-python"
+                       "transit-ruby"})
+
 (defn verify
   "Given user provided options, run all tests specified by the
   options. If options is an empty map then run all tests against all
   implementations for both encodings."
-  [{:keys [impls] :as opts}]
-  (let [root (io/file "../")
-        testable-impls (keep #(let [script (io/file root (str % "/bin/roundtrip"))]
-                                (when (.exists script) %))
-                             (.list root))
-        ;; Generate n random forms. Use the same set for all tests.
+  [{:keys [impls] :or {impls supported-impls} :as opts}]
+  (let [;; Generate n random forms. Use the same set for all tests.
         forms (when-let [n (:gen opts)]
                 (take n (repeatedly gen/ednable)))]
-    (doseq [impl testable-impls]
-      (when (or (not impls)
-                (contains? impls impl))
-        (verify-encodings impl (assoc opts :generated-forms forms))))))
+    (doseq [impl impls]
+      (if (supported-impls impl)
+        (do
+          (println (clojure.string/trim-newline (:out (shell/sh (str "bin/get-" impl)))))
+          (verify-encodings impl (assoc opts :generated-forms forms)))
+        (println (with-style :yellow "WARNING: " impl " is not supported"))))))
 
 (defn read-options
   "Given a sequence of strings which are the command line arguments,
