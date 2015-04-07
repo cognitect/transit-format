@@ -74,7 +74,7 @@ The two tables below lists all of the built-in semantic types and their correspo
 |ground| null| _ | | nil |"\_" |nil| null when not key, else "~\_" | null when not key, else "~\_" |
 |ground| string| s | | "string" | | String | String | String |
 |ground| boolean |?| |  boolean| "t" or "f"| Boolean | Boolean when not key, else "~?t" or "~?f" | Boolean when not key, else "~?t" or "~?f"|
-|ground| integer, signed 64 bit| i| | integer | "123"| smallest int that holds value | < 53 bits and not key, JSON number; else "~i1234..." | < 53 bits and not key, JSON number; else "~i1234..."|
+|ground| integer, signed 64 bit| i| | integer | "123"| smallest int that holds value | < 2^53 and not key, JSON number; else "~i1234..." | < 2^53 and not key, JSON number; else "~i1234..."|
 |ground|floating pt decimal| d| |  floating pt number | "123.456" | smallest float that matches precision | JSON number when not key, else "~d123.456" | JSON number when not key, else "~d123.456"|
 |ground| bytes| b | | base64 encoded bytes [(RFC 4648)](http://www.ietf.org/rfc/rfc4648.txt)| "base64 encoded bytes"|  "~bbase64" | "~bbase64" | "~bbase64" |
 |extension| keyword | :| s| "key"| | "~:key"| "~:key"| "~:key" |
