@@ -1,1 +1,1 @@
-[{:bbbb 2, :aaaa 1} {:bbbb 4, :aaaa 3} {:bbbb 6, :aaaa 5}]
+[{aaaa 1, bbbb 2} {aaaa 3, bbbb 4} {aaaa 5, bbbb 6}]

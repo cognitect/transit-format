@@ -307,16 +307,34 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: maps_two_char_sym_keys.edn maps_two_char_sym_keys.json maps_two_char_sym_keys.verbose.json maps_two_char_sym_keys.mp
 * Value (EDN)
 
-     [{:aa 1, :bb 2} {:aa 3, :bb 4} {:aa 5, :bb 6}]
+     [{aa 1, bb 2} {aa 3, bb 4} {aa 5, bb 6}]
 
 ## Vector of maps with identical three char symbol keys
 * Files: maps_three_char_sym_keys.edn maps_three_char_sym_keys.json maps_three_char_sym_keys.verbose.json maps_three_char_sym_keys.mp
 * Value (EDN)
 
-     [{:bbb 2, :aaa 1} {:bbb 4, :aaa 3} {:bbb 6, :aaa 5}]
+     [{aaa 1, bbb 2} {aaa 3, bbb 4} {aaa 5, bbb 6}]
 
 ## Vector of maps with identical four char symbol keys
 * Files: maps_four_char_sym_keys.edn maps_four_char_sym_keys.json maps_four_char_sym_keys.verbose.json maps_four_char_sym_keys.mp
+* Value (EDN)
+
+     [{aaaa 1, bbbb 2} {aaaa 3, bbbb 4} {aaaa 5, bbbb 6}]
+
+## Vector of maps with identical two char keyword keys
+* Files: maps_two_char_keyword_keys.edn maps_two_char_keyword_keys.json maps_two_char_keyword_keys.verbose.json maps_two_char_keyword_keys.mp
+* Value (EDN)
+
+     [{:aa 1, :bb 2} {:aa 3, :bb 4} {:aa 5, :bb 6}]
+
+## Vector of maps with identical three char keyword keys
+* Files: maps_three_char_keyword_keys.edn maps_three_char_keyword_keys.json maps_three_char_keyword_keys.verbose.json maps_three_char_keyword_keys.mp
+* Value (EDN)
+
+     [{:bbb 2, :aaa 1} {:bbb 4, :aaa 3} {:bbb 6, :aaa 5}]
+
+## Vector of maps with identical four char keyword keys
+* Files: maps_four_char_keyword_keys.edn maps_four_char_keyword_keys.json maps_four_char_keyword_keys.verbose.json maps_four_char_keyword_keys.mp
 * Value (EDN)
 
      [{:bbbb 2, :aaaa 1} {:bbbb 4, :aaaa 3} {:bbbb 6, :aaaa 5}]

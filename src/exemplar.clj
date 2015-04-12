@@ -214,18 +214,36 @@ marshal them to files for edn, json, json-verbose, and msgpack."
       dir
       "maps_two_char_sym_keys"
       "Vector of maps with identical two char symbol keys"
-      [{:aa 1 :bb 2} {:aa 3 :bb 4} {:aa 5 :bb 6}])
+      [{'aa 1 'bb 2} {'aa 3 'bb 4} {'aa 5 'bb 6}])
 
     (write-exemplar
       dir
       "maps_three_char_sym_keys"
       "Vector of maps with identical three char symbol keys"
-      [{:aaa 1 :bbb 2} {:aaa 3 :bbb 4} {:aaa 5 :bbb 6}])
+      [{'aaa 1 'bbb 2} {'aaa 3 'bbb 4} {'aaa 5 'bbb 6}])
 
     (write-exemplar
       dir
       "maps_four_char_sym_keys"
       "Vector of maps with identical four char symbol keys"
+      [{'aaaa 1 'bbbb 2} {'aaaa 3 'bbbb 4} {'aaaa 5 'bbbb 6}])
+
+    (write-exemplar
+      dir
+      "maps_two_char_keyword_keys"
+      "Vector of maps with identical two char keyword keys"
+      [{:aa 1 :bb 2} {:aa 3 :bb 4} {:aa 5 :bb 6}])
+
+    (write-exemplar
+      dir
+      "maps_three_char_keyword_keys"
+      "Vector of maps with identical three char keyword keys"
+      [{:aaa 1 :bbb 2} {:aaa 3 :bbb 4} {:aaa 5 :bbb 6}])
+
+    (write-exemplar
+      dir
+      "maps_four_char_keyword_keys"
+      "Vector of maps with identical four char keyword keys"
       [{:aaaa 1 :bbbb 2} {:aaaa 3 :bbbb 4} {:aaaa 5 :bbbb 6}])
 
     (write-exemplar
