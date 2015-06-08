@@ -82,7 +82,7 @@ The two tables below lists all of the built-in semantic types and their correspo
 |extension| arbitrary precision decimal| f| s| "123.456"| | "~f123.456"| "~f123.456"| "~f123.456" |
 |extension| arbitrary precision integer| n| s| "123"| | "~n1234"| "~n1234"| "~n1234" |
 |extension| point in time |m| i| int msecs since 1970 | "123456789" | ["~#m", int]|  "~m123456789" | N/A  |
-|extension| point in time |t |s| date string [(RFC 3339)](http://www.ietf.org/rfc/rfc3339.txt)| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
+|extension| point in time |t |s| timestamp [(RFC 3339, no offset)](http://www.ietf.org/rfc/rfc3339.txt)| | NA| NA| "~t1985-04-12T23:20:50.52Z" |
 |extension| uuid | u | s or array|  [hi64, lo64] [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)|  UUID string [(RFC 4122)](http://www.ietf.org/rfc/rfc4122.txt)|  ["~#u", [hi64, lo64]]|  "~u531a379e-31bb-4ce1-8690-158dceb64be6"|  "~u531a379e-31bb-4ce1-8690-158dceb64be6" |
 |extension| uri | r| s| | uri string [(RFC 3986)](http://www.ietf.org/rfc/rfc3986.txt)| "~rhttp://..."| "~rhttp://..."| "~rhttp://..." |
 |extension| char |c| s| "c"| | "~cc" | "~cc"| "~cc" |
