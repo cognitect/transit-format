@@ -228,7 +228,7 @@ Here is an example of write and read handlers for the point semantic type that m
      (tag [_ _] "point")
      (rep [_ p] [(.x p) (.y p)])
      (stringRep [_ kw] nil)
-     (verboseHandler [_] nil))
+     (verboseHandler [_] nil))}
 
 ;; read handler
 {"point"
@@ -256,7 +256,7 @@ Here is an example of write and read handlers for the circle semantic type that 
      (tag [_ _] "circle")
      (rep [_ c] [(.origin c) (.radius c)])
      (stringRep [_ kw] nil)
-     (verboseHandler [_] nil))
+     (verboseHandler [_] nil))}
 
 ;; read handler
 {"circle"
