@@ -122,7 +122,11 @@
 (def ednable-collections
   [[gen/vec [ednable-scalars]]
    [gen/set [ednable-scalars]]
-   [gen/hash-map [ednable-scalars ednable-scalars]]])
+   [gen/hash-map [ednable-scalars ednable-scalars]]
+   ;; cmap
+   [gen/hash-map [[(partial gen/vec (partial gen/uniform 0 10)
+                     (partial gen/uniform 1 3))]
+                  ednable-scalars]]])
 
 (defn ednable-collection
   []
