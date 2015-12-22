@@ -307,7 +307,14 @@ marshal them to files for edn, json, json-verbose, and msgpack."
      "Vector with special numbers"
      [java.lang.Double/NaN
       java.lang.Double/POSITIVE_INFINITY
-      java.lang.Double/NEGATIVE_INFINITY])))
+      java.lang.Double/NEGATIVE_INFINITY])
+
+    (write-exemplar
+      dir
+      "cmap_pathological"
+      "cmap pathological case discovered in transit-js and transit-cljs"
+      [{:any-value {["this vector makes this a cmap"] "any value" "any string" :victim}}
+       {:victim :any-other-value}])))
 
 (defn -main [& args]
   (write-exemplars (or (first args) "./simple-examples")))

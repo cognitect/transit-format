@@ -399,3 +399,9 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 
      [NaN Infinity -Infinity]
 
+## cmap pathological case discovered in transit-js and transit-cljs
+* Files: cmap_pathological.edn cmap_pathological.json cmap_pathological.verbose.json cmap_pathological.mp
+* Value (EDN)
+
+     [{:any-value {["this vector makes this a cmap"] "any value", "any string" :victim}} {:victim :any-other-value}]
+
