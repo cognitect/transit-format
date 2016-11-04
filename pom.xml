@@ -4,15 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.cognitect</groupId>
-    <artifactId>transit-clj</artifactId>
+    <artifactId>transit-format</artifactId>
     <packaging>jar</packaging>
     <version>dev</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Transit is a data format and a set of libraries for conveying
-        values between applications written in different languages. This library
-        provides support for marshalling Transit data to/from Clojure.
+        values between applications written in different languages.
     </description>
-    <url>http://github.com/cognitect/transit-clj</url>
+    <url>http://github.com/cognitect/transit-format</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -28,11 +27,11 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:cognitect/transit-clj.git
+        <connection>scm:git:git@github.com:cognitect/transit-format.git
         </connection>
-        <developerConnection>scm:git:git@github.com:cognitect/transit-clj.git
+        <developerConnection>scm:git:git@github.com:cognitect/transit-format.git
         </developerConnection>
-        <url>git@github.com:cognitect/transit-clj.git</url>
+        <url>git@github.com:cognitect/transit-format.git</url>
     </scm>
     <build>
         <resources>
@@ -166,13 +165,13 @@
         <dependency>
             <groupId>org.clojure</groupId>
             <artifactId>clojure</artifactId>
-            <version>1.6.0</version>
+            <version>1.8.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.cognitect</groupId>
             <artifactId>transit-clj</artifactId>
-            <version>0.8.271</version>
+            <version>0.8.293</version>
         </dependency>
         <dependency>
             <groupId>org.clojure</groupId>
