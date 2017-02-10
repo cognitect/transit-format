@@ -121,7 +121,12 @@ Because the ~, ^, and ` characters have special meaning, any data string that be
 
 ### Caching
 
-Transit implements a caching stream to compress repetitive data. Specifically, all ~#tag, keyword and symbol values, and strings used as map keys are cached if they are longer than 3 characters. When a value is cached, subsequent copies of the same value are replaced with cache codes.
+Transit implements a caching stream to compress repetitive data. Specifically,
+all ~#tag, keyword and symbol values are cached when they are more than 3
+characters long (including the tag).  Strings more than 3 characters long are
+also cached when they are used as keys in maps whose keys are all "stringable".
+Once a value is cached, subsequent appearances of the same value are replaced
+with cache codes.
 
 #### Cache codes
 
@@ -157,31 +162,36 @@ private int codeToIndex(String s) {
 
 On the writing side, the cache is implemented as two data structures: an incrementing counter and a map of original values to cache code.
 
-```next id = 42```
+```java
+String code = indexToCode(index++);
+```
 
 |String representation|Replacement|
 |-------|-----------|
-| "foo" | 	"^0"|
-| "~:bar" |	"^5"|
-| "~$baz"|	"^2"|
+| "abcd"  | "^0"|
+| "~:ab" |	"^1"|
+| "~$cd" |	"^2"|
 |...|...|
 
-The first time a cacheable value is written, Transit adds an entry to to the cache map, increments the counter and writes the original value. If the counter wraps to 0, the map is discarded and process starts again. The next time the cacheable value is encountered, the cache code is written instead.
+The first time a cacheable value is written, Transit adds an entry to to the
+cache map, increments the counter and writes the original value.  The next time
+the cacheable value is encountered, the cache code is written instead.  When
+the counter reaches its maximum it wraps to 0, the map is discarded, and the
+process starts again.
 
 #### Read caching
 
 On the reading side, the cache is also implemented as two data structures: an incrementing counter and an array.
 
-```next id = 42```
+```java
+String code = indexToCode(index++);
+```
 
 |Index|Replacement value
 |:----|:----------------
-|0|"foo"
-|1| |
-|2|baz
-|3| |
-|4| |
-|5|:bar
+|0|"abcd"
+|1|:ab
+|2|cd
 |...|...
 
 The first time a cacheable value is read, Transit adds an entry to the cache array, increments the counter and processes the original value. If the counter wraps, the process starts again from 0. When a cache code is read, the corresponding original value is retrieved from the indicated index in the read cache.
