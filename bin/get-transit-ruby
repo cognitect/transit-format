@@ -7,11 +7,11 @@ command -v rbenv >/dev/null 2>&1 || { echo >&2 "transit-ruby and transit-jruby r
 if [ ! -d "transit-ruby" ]; then
   git clone git@github.com:cognitect/transit-ruby.git
   cd transit-ruby
-  rbenv local 2.1.2
+  rbenv local 2.4.0
   ruby -S gem install bundler
   bundle install
 else
   cd transit-ruby
-  rbenv local 2.1.2
+  rbenv local 2.4.0
   echo "transit-ruby exists"
 fi
