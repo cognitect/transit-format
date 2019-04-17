@@ -130,7 +130,7 @@ with cache codes.
 
 #### Cache codes
 
-Cache codes are generated using an increasing integer index. The number is converted to a one or two digit string expressed ASCII 44-91, inclusive, for numerals with a "^" prefix, i.e., "^c" or "^cc". Since there are 44 numerals and up to 2 digits, the possible range of cache codes is from 0 to 44^2. The code below shows how to convert back and forth between integer indexes and the corresponding cache codes.
+Cache codes are generated using an increasing integer index. The number is converted to a one or two digit string expressed ASCII 48-91, inclusive, for numerals with a "^" prefix, i.e., "^c" or "^cc". Since there are 44 numerals and up to 2 digits, the possible range of cache codes is from 0 to 44^2. The code below shows how to convert back and forth between integer indexes and the corresponding cache codes.
 
 ```java
 private static final int CACHE_CODE_DIGITS = 44;
