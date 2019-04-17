@@ -35,7 +35,7 @@ There are currently verified implementations for the following languages:
 
 Each library's major.minor version number corresponds to the version of this specification it implements.
 
-_NOTE: Transit is a work in progress and may evolve based on feedback. As a result, while Transit is a great option for transferring data between applications, it should not yet be used for storing data durably over time. This recommendation will change when the specification is complete._
+_NOTE: Transit is intended primarily as a wire protocol for transferring data between applications. If storing Transit data durably, readers and writers are expected to use the same version of Transit and you are responsible for migrating/transforming/re-storing that data when and if the transit format changes._
 
 For additional languages, see the list of [community-provided implementations](https://github.com/cognitect/transit-format/wiki/Community-Implementations).
 
