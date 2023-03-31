@@ -163,13 +163,13 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: one_uri.edn one_uri.json one_uri.verbose.json one_uri.mp
 * Value (EDN)
 
-     #object[java.net.URI 0x15e0fe05 "http://example.com"]
+     #object[java.net.URI 0x3b90a30a "http://example.com"]
 
 ## A vector of URIs
 * Files: uris.edn uris.json uris.verbose.json uris.mp
 * Value (EDN)
 
-     [#object[java.net.URI 0x15e0fe05 "http://example.com"] #object[java.net.URI 0x1128620c "ftp://example.com"] #object[java.net.URI 0x6bf13698 "file:///path/to/file.txt"] #object[java.net.URI 0x299270eb "http://www.詹姆斯.com/"]]
+     [#object[java.net.URI 0x3b90a30a "http://example.com"] #object[java.net.URI 0x69fa8e76 "ftp://example.com"] #object[java.net.URI 0xbdd2027 "file:///path/to/file.txt"] #object[java.net.URI 0x31f20c9f "http://www.詹姆斯.com/"]]
 
 ## A vector of interesting dates: 1776-07-04, 1970-01-01, 2000-01-01, 2014-04-07
 * Files: dates_interesting.edn dates_interesting.json dates_interesting.verbose.json dates_interesting.mp
@@ -361,7 +361,7 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: maps_unrecognized_keys.edn maps_unrecognized_keys.json maps_unrecognized_keys.verbose.json maps_unrecognized_keys.mp
 * Value (EDN)
 
-     [#object[com.cognitect.transit.impl.TaggedValueImpl 0x7159a5cd "com.cognitect.transit.impl.TaggedValueImpl@f023ef7c"] #object[com.cognitect.transit.impl.TaggedValueImpl 0x4f966719 "com.cognitect.transit.impl.TaggedValueImpl@54133e58"]]
+     [#object[com.cognitect.transit.impl.TaggedValueImpl 0x7063686f "com.cognitect.transit.impl.TaggedValueImpl@f023ef7c"] #object[com.cognitect.transit.impl.TaggedValueImpl 0xc3177d5 "com.cognitect.transit.impl.TaggedValueImpl@54133e58"]]
 
 ## Map with vals with unrecognized encodings
 * Files: map_unrecognized_vals.edn map_unrecognized_vals.json map_unrecognized_vals.verbose.json map_unrecognized_vals.mp
@@ -398,6 +398,12 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Value (EDN)
 
      [##NaN ##Inf ##-Inf]
+
+## Cmap with null key
+* Files: cmap_null_key.edn cmap_null_key.json cmap_null_key.verbose.json cmap_null_key.mp
+* Value (EDN)
+
+     {nil "null as map key", [1 2] "Array as key to force cmap"}
 
 ## cmap pathological case discovered in transit-js and transit-cljs
 * Files: cmap_pathological.edn cmap_pathological.json cmap_pathological.verbose.json cmap_pathological.mp

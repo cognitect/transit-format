@@ -310,6 +310,13 @@ marshal them to files for edn, json, json-verbose, and msgpack."
       java.lang.Double/NEGATIVE_INFINITY])
 
     (write-exemplar
+     dir
+     "cmap_null_key"
+     "Cmap with null key"
+     {nil "null as map key"
+      [1 2] "Array as key to force cmap"})
+
+    (write-exemplar
       dir
       "cmap_pathological"
       "cmap pathological case discovered in transit-js and transit-cljs"

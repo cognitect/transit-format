@@ -1,0 +1,1 @@
+{nil "null as map key", [1 2] "Array as key to force cmap"}
