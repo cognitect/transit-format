@@ -1,1 +1,1 @@
-ƒ¦second¥third¥first
+ƒ¥first¦second¥third

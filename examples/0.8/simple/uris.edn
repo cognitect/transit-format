@@ -1,1 +1,1 @@
-[#<URI http://example.com> #<URI ftp://example.com> #<URI file:///path/to/file.txt> #<URI http://www.詹姆斯.com/>]
+[#object[java.net.URI 0x15e0fe05 "http://example.com"] #object[java.net.URI 0x1128620c "ftp://example.com"] #object[java.net.URI 0x6bf13698 "file:///path/to/file.txt"] #object[java.net.URI 0x299270eb "http://www.詹姆斯.com/"]]

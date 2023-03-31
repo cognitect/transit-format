@@ -163,13 +163,13 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: one_uri.edn one_uri.json one_uri.verbose.json one_uri.mp
 * Value (EDN)
 
-     #<URI http://example.com>
+     #object[java.net.URI 0x15e0fe05 "http://example.com"]
 
 ## A vector of URIs
 * Files: uris.edn uris.json uris.verbose.json uris.mp
 * Value (EDN)
 
-     [#<URI http://example.com> #<URI ftp://example.com> #<URI file:///path/to/file.txt> #<URI http://www.詹姆斯.com/>]
+     [#object[java.net.URI 0x15e0fe05 "http://example.com"] #object[java.net.URI 0x1128620c "ftp://example.com"] #object[java.net.URI 0x6bf13698 "file:///path/to/file.txt"] #object[java.net.URI 0x299270eb "http://www.詹姆斯.com/"]]
 
 ## A vector of interesting dates: 1776-07-04, 1970-01-01, 2000-01-01, 2014-04-07
 * Files: dates_interesting.edn dates_interesting.json dates_interesting.verbose.json dates_interesting.mp
@@ -241,25 +241,25 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: map_simple.edn map_simple.json map_simple.verbose.json map_simple.mp
 * Value (EDN)
 
-     {:c 3, :b 2, :a 1}
+     {:a 1, :b 2, :c 3}
 
 ## A mixed map
 * Files: map_mixed.edn map_mixed.json map_mixed.verbose.json map_mixed.mp
 * Value (EDN)
 
-     {:c true, :b "a string", :a 1}
+     {:a 1, :b "a string", :c true}
 
 ## A nested map
 * Files: map_nested.edn map_nested.json map_nested.verbose.json map_nested.mp
 * Value (EDN)
 
-     {:simple {:c 3, :b 2, :a 1}, :mixed {:c true, :b "a string", :a 1}}
+     {:simple {:a 1, :b 2, :c 3}, :mixed {:a 1, :b "a string", :c true}}
 
 ## A map with string keys
 * Files: map_string_keys.edn map_string_keys.json map_string_keys.verbose.json map_string_keys.mp
 * Value (EDN)
 
-     {"second" 2, "third" 3, "first" 1}
+     {"first" 1, "second" 2, "third" 3}
 
 ## A map with numeric keys
 * Files: map_numeric_keys.edn map_numeric_keys.json map_numeric_keys.verbose.json map_numeric_keys.mp
@@ -271,7 +271,7 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: map_vector_keys.edn map_vector_keys.json map_vector_keys.verbose.json map_vector_keys.mp
 * Value (EDN)
 
-     {[2 2] "two", [1 1] "one"}
+     {[1 1] "one", [2 2] "two"}
 
 ## 10 item map
 * Files: map_10_items.edn map_10_items.json map_10_items.verbose.json map_10_items.mp
@@ -331,13 +331,13 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: maps_three_char_keyword_keys.edn maps_three_char_keyword_keys.json maps_three_char_keyword_keys.verbose.json maps_three_char_keyword_keys.mp
 * Value (EDN)
 
-     [{:bbb 2, :aaa 1} {:bbb 4, :aaa 3} {:bbb 6, :aaa 5}]
+     [{:aaa 1, :bbb 2} {:aaa 3, :bbb 4} {:aaa 5, :bbb 6}]
 
 ## Vector of maps with identical four char keyword keys
 * Files: maps_four_char_keyword_keys.edn maps_four_char_keyword_keys.json maps_four_char_keyword_keys.verbose.json maps_four_char_keyword_keys.mp
 * Value (EDN)
 
-     [{:bbbb 2, :aaaa 1} {:bbbb 4, :aaaa 3} {:bbbb 6, :aaaa 5}]
+     [{:aaaa 1, :bbbb 2} {:aaaa 3, :bbbb 4} {:aaaa 5, :bbbb 6}]
 
 ## Vector of maps with identical two char string keys
 * Files: maps_two_char_string_keys.edn maps_two_char_string_keys.json maps_two_char_string_keys.verbose.json maps_two_char_string_keys.mp
@@ -349,7 +349,7 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: maps_three_char_string_keys.edn maps_three_char_string_keys.json maps_three_char_string_keys.verbose.json maps_three_char_string_keys.mp
 * Value (EDN)
 
-     [{"bbb" 2, "aaa" 1} {"bbb" 4, "aaa" 3} {"bbb" 6, "aaa" 5}]
+     [{"aaa" 1, "bbb" 2} {"aaa" 3, "bbb" 4} {"aaa" 5, "bbb" 6}]
 
 ## Vector of maps with identical four char string keys
 * Files: maps_four_char_string_keys.edn maps_four_char_string_keys.json maps_four_char_string_keys.verbose.json maps_four_char_string_keys.mp
@@ -361,7 +361,7 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: maps_unrecognized_keys.edn maps_unrecognized_keys.json maps_unrecognized_keys.verbose.json maps_unrecognized_keys.mp
 * Value (EDN)
 
-     [#<TaggedValueImpl com.cognitect.transit.impl.TaggedValueImpl@f023ef7c> #<TaggedValueImpl com.cognitect.transit.impl.TaggedValueImpl@54133e58>]
+     [#object[com.cognitect.transit.impl.TaggedValueImpl 0x7159a5cd "com.cognitect.transit.impl.TaggedValueImpl@f023ef7c"] #object[com.cognitect.transit.impl.TaggedValueImpl 0x4f966719 "com.cognitect.transit.impl.TaggedValueImpl@54133e58"]]
 
 ## Map with vals with unrecognized encodings
 * Files: map_unrecognized_vals.edn map_unrecognized_vals.json map_unrecognized_vals.verbose.json map_unrecognized_vals.mp
@@ -397,7 +397,7 @@ See https://github.com/cognitect/transit-clj/blob/master/test/exemplar.clj
 * Files: vector_special_numbers.edn vector_special_numbers.json vector_special_numbers.verbose.json vector_special_numbers.mp
 * Value (EDN)
 
-     [NaN Infinity -Infinity]
+     [##NaN ##Inf ##-Inf]
 
 ## cmap pathological case discovered in transit-js and transit-cljs
 * Files: cmap_pathological.edn cmap_pathological.json cmap_pathological.verbose.json cmap_pathological.mp
