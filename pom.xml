@@ -165,24 +165,24 @@
         <dependency>
             <groupId>org.clojure</groupId>
             <artifactId>clojure</artifactId>
-            <version>1.11.1</version>
+            <version>1.12.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.cognitect</groupId>
             <artifactId>transit-clj</artifactId>
-            <version>1.0.329</version>
+            <version>1.1.347</version>
         </dependency>
         <dependency>
             <groupId>org.clojure</groupId>
             <artifactId>data.generators</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.1.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
+            <version>1.21.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
